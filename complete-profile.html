@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced Country Simulator · Found Your Empire</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,500&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Cropper.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b0e14;
+      font-family: 'Cinzel', serif;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .world-bg {
+      position: fixed;
+      inset: 0;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" opacity="0.07"><path fill="%23b8a88a" d="M200,200 L250,180 L300,210 L320,170 L370,190 L400,150 L450,170 L490,140 L530,170 L580,150 L620,180 L670,150 L720,180 L760,150 L800,180 L840,150 L880,180 L920,160 L960,190 L1000,170 L1040,200 L1080,180 L1120,210 L1160,190 L1180,220 L1150,250 L1110,240 L1070,260 L1030,250 L990,270 L950,250 L910,270 L870,250 L830,270 L790,250 L750,270 L710,250 L670,270 L630,250 L590,270 L550,250 L510,270 L470,250 L430,270 L390,250 L350,270 L310,250 L270,270 L230,250 L190,270 L160,240 L180,210 Z"/><path fill="%23b8a88a" d="M400,400 L450,380 L500,410 L540,390 L580,420 L620,400 L660,430 L700,410 L740,440 L780,420 L820,450 L860,430 L900,460 L940,440 L980,470 L1020,450 L1060,480 L1100,460 L1120,490 L1080,510 L1040,500 L1000,520 L960,500 L920,520 L880,500 L840,520 L800,500 L760,520 L720,500 L680,520 L640,500 L600,520 L560,500 L520,520 L480,500 L440,520 L400,500 L360,520 L320,500 L280,520 L240,500 L200,520 L160,500 L180,470 L220,490 L260,470 L300,490 L340,470 L380,490 L420,470 L460,490 L500,470 L540,490 L580,470 L620,490 L660,470 L700,490 L740,470 L780,490 L820,470 L860,490 L900,470 L940,490 L980,470 L1020,490 L1060,470 L1100,490 L1120,460 L1080,440 L1040,460 L1000,440 L960,460 L920,440 L880,460 L840,440 L800,460 L760,440 L720,460 L680,440 L640,460 L600,440 L560,460 L520,440 L480,460 L440,440 L400,460 L360,440 L320,460 L280,440 L240,460 L200,440 L160,460 L140,420 L180,400 Z"/><circle cx="300" cy="550" r="40" fill="%23b8a88a"/><circle cx="700" cy="600" r="60" fill="%23b8a88a"/><circle cx="950" cy="520" r="45" fill="%23b8a88a"/></svg>') no-repeat center/cover;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .symbol-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      color: rgba(200, 180, 140, 0.06);
+      font-size: 5rem;
+      font-family: 'Playfair Display', serif;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-content: space-around;
+      letter-spacing: 8rem;
+      padding: 3rem;
+    }
+    .symbol-overlay span {
+      opacity: 0.5;
+      transform: rotate(4deg);
+    }
+
+    .auth-card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(18, 22, 30, 0.8);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
+      border-radius: 3rem 1rem 3rem 1rem;
+      border: 1px solid rgba(200, 180, 140, 0.3);
+      box-shadow: 
+        0 20px 50px rgba(0,0,0,0.8),
+        0 0 40px rgba(200, 160, 80, 0.25),
+        0 0 80px rgba(200, 160, 80, 0.12),
+        inset 0 0 40px rgba(200, 160, 80, 0.05);
+      padding: 2.5rem 2rem 2.2rem;
+      transition: box-shadow 0.3s ease;
+      animation: candleGlow 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes candleGlow {
+      0% {
+        box-shadow: 
+          0 20px 50px rgba(0,0,0,0.8),
+          0 0 30px rgba(200, 160, 80, 0.15),
+          0 0 70px rgba(200, 160, 80, 0.08),
+          inset 0 0 30px rgba(200, 160, 80, 0.03);
+      }
+      50% {
+        box-shadow: 
+          0 20px 50px rgba(0,0,0,0.8),
+          0 0 55px rgba(210, 180, 100, 0.35),
+          0 0 110px rgba(200, 160, 80, 0.18),
+          inset 0 0 50px rgba(210, 180, 100, 0.08);
+      }
+      100% {
+        box-shadow: 
+          0 20px 50px rgba(0,0,0,0.8),
+          0 0 35px rgba(200, 160, 80, 0.20),
+          0 0 80px rgba(200, 160, 80, 0.10),
+          inset 0 0 35px rgba(200, 160, 80, 0.05);
+      }
+    }
+
+    .flag-decor {
+      position: absolute;
+      font-size: 2.8rem;
+      opacity: 0.07;
+      pointer-events: none;
+      z-index: 0;
+      letter-spacing: 0.5rem;
+    }
+    .flag-decor:nth-child(1) { top: 10px; left: 10px; transform: rotate(-10deg); }
+    .flag-decor:nth-child(2) { bottom: 10px; right: 10px; transform: rotate(12deg); }
+    .flag-decor:nth-child(3) { top: 50%; left: 5%; transform: rotate(25deg); }
+    .flag-decor:nth-child(4) { bottom: 20%; right: 5%; transform: rotate(-20deg); }
+
+    .card-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .card-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 2.6rem;
+      letter-spacing: 6px;
+      color: #e3d6b0;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.6), 0 0 30px rgba(180, 140, 80, 0.15);
+      border-bottom: 1px solid rgba(200, 180, 140, 0.25);
+      display: inline-block;
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.3rem;
+    }
+    .card-header .sub {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      color: #b8a88a;
+      letter-spacing: 3px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .auth-form {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .input-group {
+      position: relative;
+      border-bottom: 1px solid rgba(200, 180, 140, 0.2);
+      padding-bottom: 0.2rem;
+      transition: border-color 0.3s;
+    }
+    .input-group:focus-within {
+      border-color: #c9b382;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 0;
+      bottom: 0.6rem;
+      color: #b8a88a;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .input-group input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f0ead8;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: 0.95rem;
+      padding: 0.6rem 0.6rem 0.6rem 2rem;
+      letter-spacing: 0.5px;
+    }
+    .input-group input::placeholder {
+      color: #7a705a;
+      font-weight: 300;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+    }
+    .input-group input:focus + i {
+      color: #e3d6b0;
+    }
+
+    /* Username availability - hidden by default */
+    .input-hint {
+      font-size: 0.65rem;
+      text-align: right;
+      padding-right: 0.3rem;
+      margin-top: 0.1rem;
+      letter-spacing: 0.3px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      height: 1.2rem;
+    }
+    .input-hint.visible {
+      opacity: 1;
+    }
+    .input-hint .available {
+      color: #6a8c6a;
+    }
+    .input-hint .unavailable {
+      color: #b55a5a;
+    }
+
+    /* Password mismatch - hidden by default */
+    .password-hint {
+      font-size: 0.65rem;
+      color: #b55a5a;
+      text-align: right;
+      padding-right: 0.3rem;
+      margin-top: 0.1rem;
+      letter-spacing: 0.3px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      height: 1.2rem;
+    }
+    .password-hint.visible {
+      opacity: 1;
+    }
+
+    .upload-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.2rem;
+      border: 1px dashed rgba(200, 180, 140, 0.25);
+      border-radius: 1rem 0.3rem 1rem 0.3rem;
+      padding: 0.7rem 1rem;
+      background: rgba(0,0,0,0.15);
+      transition: border-color 0.3s;
+      cursor: pointer;
+    }
+    .upload-area:hover {
+      border-color: #c9b382;
+    }
+    .upload-area i {
+      color: #b8a88a;
+      font-size: 1.3rem;
+    }
+    .upload-area span {
+      color: #b8a88a;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+    }
+    .upload-area input[type="file"] {
+      display: none;
+    }
+    .upload-area .file-name {
+      color: #d4c09a;
+      font-size: 0.75rem;
+      margin-left: auto;
+      opacity: 0.6;
+    }
+
+    .crop-hint {
+      font-size: 0.65rem;
+      color: #7a705a;
+      text-align: right;
+      letter-spacing: 0.3px;
+      margin-top: 0.2rem;
+      opacity: 0.6;
+    }
+    .crop-hint i {
+      margin-right: 4px;
+    }
+
+    /* Cropper modal overlay */
+    .cropper-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      backdrop-filter: blur(4px);
+    }
+    .cropper-overlay.active {
+      display: flex;
+    }
+    .cropper-container {
+      background: #1a1e28;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      max-width: 700px;
+      width: 100%;
+      border: 1px solid rgba(200, 180, 140, 0.2);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    }
+    .cropper-container .cropper-box {
+      max-height: 450px;
+      overflow: hidden;
+      border-radius: 0.5rem;
+      background: #0b0e14;
+    }
+    .cropper-container #imageToCrop {
+      max-width: 100%;
+      display: block;
+    }
+    .cropper-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.2rem;
+      justify-content: flex-end;
+    }
+    .cropper-actions .btn-crop {
+      background: #c9b382;
+      border: none;
+      color: #0b0e14;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      padding: 0.6rem 1.8rem;
+      border-radius: 2rem 0.5rem 2rem 0.5rem;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: 0.2s;
+    }
+    .cropper-actions .btn-crop:hover {
+      background: #e3d6b0;
+      transform: scale(1.02);
+    }
+    .cropper-actions .btn-cancel-crop {
+      background: transparent;
+      border: 1px solid #6a5f4a;
+      color: #b8a88a;
+      font-family: 'Cinzel', serif;
+      padding: 0.6rem 1.8rem;
+      border-radius: 2rem 0.5rem 2rem 0.5rem;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: 0.2s;
+    }
+    .cropper-actions .btn-cancel-crop:hover {
+      border-color: #b8a88a;
+      color: #e3d6b0;
+    }
+    .cropper-ratio-badge {
+      color: #7a705a;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-right: auto;
+      align-self: center;
+    }
+
+    .btn-primary {
+      background: transparent;
+      border: 1px solid #c9b382;
+      color: #e3d6b0;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      letter-spacing: 4px;
+      padding: 0.9rem 1.5rem;
+      border-radius: 2rem 0.5rem 2rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      margin-top: 0.2rem;
+      background: rgba(200, 180, 140, 0.04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .btn-primary:hover {
+      background: rgba(200, 180, 140, 0.15);
+      border-color: #e3d6b0;
+      box-shadow: 0 0 30px rgba(200, 180, 140, 0.12);
+      transform: scale(1.01);
+      letter-spacing: 5px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #6a5f4a;
+      color: #b8a88a;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      letter-spacing: 3px;
+      padding: 0.7rem 1.2rem;
+      border-radius: 1.5rem 0.3rem 1.5rem 0.3rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      background: rgba(0,0,0,0.15);
+    }
+    .btn-secondary:hover {
+      background: rgba(200, 180, 140, 0.08);
+      border-color: #b8a88a;
+      color: #d4c09a;
+    }
+
+    .switch-prompt {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #7a705a;
+    }
+    .switch-prompt a {
+      color: #c9b382;
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px dotted #c9b382;
+      transition: 0.2s;
+      margin-left: 6px;
+    }
+    .switch-prompt a:hover {
+      color: #e3d6b0;
+      border-bottom-color: #e3d6b0;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.3rem;
+    }
+    .action-row .btn-primary {
+      flex: 2;
+    }
+    .action-row .btn-secondary {
+      flex: 1;
+    }
+
+    .auth-card {
+      animation: cardEntry 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+    }
+    @keyframes cardEntry {
+      0% { opacity: 0; transform: translateY(30px) scale(0.97); }
+      100% { opacity: 1; transform: translateY(0px) scale(1); }
+    }
+
+    @media (max-width: 550px) {
+      .auth-card { padding: 1.8rem 1.2rem; }
+      .card-header h1 { font-size: 2rem; }
+      .action-row { flex-direction: column; }
+      .cropper-container { padding: 1rem; }
+    }
+
+    .empire-sigil {
+      position: absolute;
+      bottom: 1.2rem;
+      right: 1.5rem;
+      font-size: 1.2rem;
+      color: rgba(200, 180, 140, 0.12);
+      letter-spacing: 0.2rem;
+      z-index: 0;
+    }
+    
+    /* Flag preview */
+.flag-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(200, 180, 140, 0.1);
+  min-height: 80px;
+}
+.flag-preview-box {
+  width: 90px;
+  height: 60px;
+  border: 2px solid rgba(200, 180, 140, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+.flag-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.flag-preview-box .placeholder {
+  color: #7a705a;
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.flag-preview-info {
+  flex: 1;
+  color: #b8a88a;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
+.flag-preview-info .filename {
+  color: #d4c09a;
+  font-weight: 600;
+}
+.flag-preview-info .dimensions {
+  color: #7a705a;
+  font-size: 0.6rem;
+  margin-top: 2px;
+}
+
+/* Country selection heading & map placeholder */
+.country-section-heading {
+  color: #d4c09a;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin: 0.3rem 0 0.5rem 0;
+  border-bottom: 1px solid rgba(200, 180, 140, 0.15);
+  padding-bottom: 0.3rem;
+  font-weight: 600;
+}
+.country-section-heading i {
+  margin-right: 8px;
+  color: #c9b382;
+}
+.map-placeholder {
+  width: 100%;
+  height: 150px;
+  border: 2px dashed rgba(200, 180, 140, 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.map-placeholder:hover {
+  border-color: rgba(200, 180, 140, 0.4);
+  background: rgba(0,0,0,0.3);
+}
+.map-placeholder i {
+  font-size: 2.5rem;
+  color: #7a705a;
+  opacity: 0.5;
+}
+.map-placeholder span {
+  color: #7a705a;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.map-placeholder .click-hint {
+  color: #5a5040;
+  font-size: 0.55rem;
+  letter-spacing: 1px;
+}
+
+/* Map container styles */
+#mapContainer svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#mapContainer .country {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#mapContainer .country:hover {
+  opacity: 0.7;
+  filter: brightness(1.2);
+}
+
+#mapContainer .country.selected {
+  stroke: #c9b382;
+  stroke-width: 4;
+  filter: brightness(1.1);
+}
+
+#mapContainer .country-occupied {
+  stroke: #6a8c6a;
+  stroke-width: 3;
+}
+
+#mapContainer .country-unavailable {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.map-selection-info {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 0.3rem;
+  font-size: 0.7rem;
+  color: #b8a88a;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.map-selection-info .selected-country {
+  color: #e3d6b0;
+  font-weight: 600;
+}
+  </style>
+</head>
+<body>
+  <div class="world-bg"></div>
+  <div class="symbol-overlay">
+    <span>☭</span> <span>★</span> <span>☭</span> <span>★</span> <span>☭</span> <span>★</span>
+    <span>☭</span> <span>★</span> <span>☭</span> <span>★</span> <span>☭</span> <span>★</span>
+  </div>
+
+  <!-- SIGNUP CARD -->
+  <div class="auth-card">
+    <div class="flag-decor">🏴🏳️🇺🇳🇪🇺🏁</div>
+    <div class="flag-decor">🇬🇧🇫🇷🇩🇪🇮🇹🇪🇸</div>
+    <div class="flag-decor">🇷🇺🇨🇳🇯🇵🇰🇷🇮🇳</div>
+    <div class="flag-decor">🇺🇸🇨🇦🇦🇺🇧🇷🇿🇦</div>
+
+    <div class="card-header">
+      <h1>IMPERIUM</h1>
+      <div class="sub">⚔️ found your empire ⚔️</div>
+    </div>
+
+    <!-- Shown while we check the confirmation session / if not logged in -->
+    <div id="authGate" style="text-align:center; padding: 1rem 0; color:#b8a88a; font-size:0.85rem; letter-spacing:0.5px;">
+      <i class="fas fa-spinner fa-spin"></i> Confirming your account...
+    </div>
+
+    <form class="auth-form" id="signupForm" action="#" method="post" enctype="multipart/form-data" style="display:none;">
+      <!-- Create Username -->
+      <div class="input-group">
+        <input type="text" id="newUsername" placeholder="Create Username" required />
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <div class="input-hint" id="usernameHint"><span class="available"><i class="fas fa-check-circle"></i> username available</span></div>
+
+      <!-- Country Selection Heading -->
+<div class="country-section-heading">
+  <i class="fas fa-map-marked-alt"></i> Choose Your Country
+</div>
+
+<!-- Clickable Map -->
+<div class="map-placeholder" id="mapPlaceholder" style="padding: 0; overflow: hidden; height: auto; min-height: 200px; cursor: default;">
+  <div id="mapContainer" style="width: 100%; height: 100%; min-height: 200px; position: relative;">
+    <!-- SVG will be loaded here -->
+    <div id="mapLoading" style="display: flex; align-items: center; justify-content: center; height: 200px; flex-direction: column; gap: 1rem;">
+      <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #7a705a;"></i>
+      <span style="color: #7a705a; font-size: 0.8rem;">Loading map...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Enter country name -->
+<div class="input-group">
+  <input type="text" id="countryFull" placeholder="Enter country name" />
+  <i class="fas fa-flag"></i>
+</div>
+<div class="input-hint" id="countryNameHint"><span class="available"><i class="fas fa-check-circle"></i> name available</span></div>
+
+      <!-- Upload flag with preview -->
+<div class="upload-area" id="flagUploadArea">
+  <i class="fas fa-cloud-upload-alt"></i>
+  <span>Upload your flag</span>
+  <input type="file" id="flagFile" accept="image/*" />
+  <span class="file-name" id="fileNameDisplay">no file chosen</span>
+</div>
+<div class="crop-hint"><i class="fas fa-crop-alt"></i> crop to fixed 3:2 ratio (click file to crop)</div>
+
+<!-- Flag Preview -->
+<div class="flag-preview-container" id="flagPreviewContainer">
+  <div class="flag-preview-box" id="flagPreviewBox">
+    <div class="placeholder">NO FLAG</div>
+  </div>
+  <div class="flag-preview-info">
+    <div class="filename" id="previewFilename">No flag selected</div>
+    <div class="dimensions" id="previewDimensions">3:2 ratio • 600x400px</div>
+  </div>
+</div>
+
+<div class="action-row">
+  <button type="submit" class="btn-primary">found empire</button>
+  <button type="reset" class="btn-secondary">clear</button>
+</div>
+
+<!-- Status / error messages -->
+<div id="formMessage" style="display:none; margin-top:0.8rem; padding:0.6rem 0.8rem; border-radius:0.4rem; font-size:0.75rem; letter-spacing:0.3px; text-align:center;"></div>
+    </form>
+
+    <div class="empire-sigil">✦ ☭ ✦</div>
+  </div>
+
+  <!-- CROPPER OVERLAY -->
+  <div class="cropper-overlay" id="cropperOverlay">
+    <div class="cropper-container">
+      <div class="cropper-box">
+        <img id="imageToCrop" src="#" alt="Crop your flag" />
+      </div>
+      <div class="cropper-actions">
+        <span class="cropper-ratio-badge"><i class="fas fa-arrows-alt-h"></i> 3:2 fixed</span>
+        <button class="btn-cancel-crop" id="cancelCropBtn">cancel</button>
+        <button class="btn-crop" id="confirmCropBtn">crop & apply</button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://otfcugzjpretomyvwhny.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90ZmN1Z3pqcHJldG9teXZ3aG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczNzUwNDQsImV4cCI6MjEwMjk1MTA0NH0.NXWr4ZJ9CNyDlmeGecls6gseeKgFqSaebJmslK-8SAo';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+  (function() {
+    // ---- DOM refs ----
+    const fileInput = document.getElementById('flagFile');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const uploadArea = document.getElementById('flagUploadArea');
+    const cropperOverlay = document.getElementById('cropperOverlay');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const confirmCropBtn = document.getElementById('confirmCropBtn');
+    const cancelCropBtn = document.getElementById('cancelCropBtn');
+    
+    // Preview elements
+    const previewBox = document.getElementById('flagPreviewBox');
+    const previewFilename = document.getElementById('previewFilename');
+    const previewDimensions = document.getElementById('previewDimensions');
+
+    // Map elements
+    const mapContainer = document.getElementById('mapContainer');
+    const mapLoading = document.getElementById('mapLoading');
+    let selectedCountryId = null;
+    let countryData = {};
+
+    // ---- Username availability (hidden until typing) ----
+    const usernameInput = document.getElementById('newUsername');
+    const usernameHint = document.getElementById('usernameHint');
+
+    let usernameCheckTimer = null;
+    usernameInput.addEventListener('input', function() {
+      const val = this.value.trim();
+      clearTimeout(usernameCheckTimer);
+      if (val.length === 0) {
+        usernameHint.classList.remove('visible');
+        return;
+      }
+      usernameHint.classList.add('visible');
+      const hintSpan = usernameHint.querySelector('span');
+      hintSpan.className = '';
+      hintSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> checking...';
+      usernameCheckTimer = setTimeout(async () => {
+        const { data, error } = await supabase.rpc('is_username_available', { check_username: val });
+        if (error) {
+          hintSpan.className = 'unavailable';
+          hintSpan.innerHTML = '<i class="fas fa-exclamation-circle"></i> could not check';
+          return;
+        }
+        if (data) {
+          hintSpan.className = 'available';
+          hintSpan.innerHTML = '<i class="fas fa-check-circle"></i> username available';
+        } else {
+          hintSpan.className = 'unavailable';
+          hintSpan.innerHTML = '<i class="fas fa-times-circle"></i> username taken';
+        }
+      }, 450);
+    });
+
+    // ---- Country name availability (debounced, real check via Supabase) ----
+    const countryNameInput = document.getElementById('countryFull');
+    const countryNameHint = document.getElementById('countryNameHint');
+    let countryNameCheckTimer = null;
+    countryNameInput.addEventListener('input', function() {
+      const val = this.value.trim();
+      clearTimeout(countryNameCheckTimer);
+      if (val.length === 0) {
+        countryNameHint.classList.remove('visible');
+        return;
+      }
+      countryNameHint.classList.add('visible');
+      const hintSpan = countryNameHint.querySelector('span');
+      hintSpan.className = '';
+      hintSpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> checking...';
+      countryNameCheckTimer = setTimeout(async () => {
+        const { data, error } = await supabase.rpc('is_country_name_available', { check_name: val });
+        if (error) {
+          hintSpan.className = 'unavailable';
+          hintSpan.innerHTML = '<i class="fas fa-exclamation-circle"></i> could not check';
+          return;
+        }
+        if (data) {
+          hintSpan.className = 'available';
+          hintSpan.innerHTML = '<i class="fas fa-check-circle"></i> name available';
+        } else {
+          hintSpan.className = 'unavailable';
+          hintSpan.innerHTML = '<i class="fas fa-times-circle"></i> name taken';
+        }
+      }, 450);
+    });
+
+    // ---- Form status message helper ----
+    const formMessage = document.getElementById('formMessage');
+    function showMessage(text, type) {
+      formMessage.style.display = 'block';
+      formMessage.textContent = text;
+      if (type === 'error') {
+        formMessage.style.background = 'rgba(181,90,90,0.12)';
+        formMessage.style.border = '1px solid rgba(181,90,90,0.4)';
+        formMessage.style.color = '#e0a3a3';
+      } else {
+        formMessage.style.background = 'rgba(106,140,106,0.12)';
+        formMessage.style.border = '1px solid rgba(106,140,106,0.4)';
+        formMessage.style.color = '#a9d0a9';
+      }
+    }
+    function clearMessage() {
+      formMessage.style.display = 'none';
+    }
+
+    const submitBtn = document.querySelector('#signupForm button[type="submit"]');
+    function setLoading(isLoading, label) {
+      submitBtn.disabled = isLoading;
+      submitBtn.textContent = isLoading ? (label || 'please wait...') : 'signup';
+    }
+
+    // ---- Update flag preview ----
+    function updatePreview(imageSrc, filename) {
+      previewBox.innerHTML = '';
+      
+      if (imageSrc) {
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.alt = 'Flag preview';
+        previewBox.appendChild(img);
+        previewFilename.textContent = filename || 'Cropped flag';
+        previewDimensions.textContent = '3:2 ratio • 600x400px';
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'placeholder';
+        placeholder.textContent = 'NO FLAG';
+        previewBox.appendChild(placeholder);
+        previewFilename.textContent = 'No flag selected';
+        previewDimensions.textContent = '3:2 ratio • 600x400px';
+      }
+    }
+
+    // ---- Cropper logic ----
+    let cropper = null;
+    let currentFile = null;
+
+    function openCropper(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imageToCrop.src = e.target.result;
+        cropperOverlay.classList.add('active');
+        imageToCrop.onload = function() {
+          if (cropper) cropper.destroy();
+          cropper = new Cropper(imageToCrop, {
+            aspectRatio: 3 / 2,
+            viewMode: 1,
+            dragMode: 'move',
+            cropBoxResizable: true,
+            autoCropArea: 0.8,
+            background: false,
+            responsive: true,
+          });
+        };
+        if (imageToCrop.complete) {
+          imageToCrop.onload();
+        }
+      };
+      reader.readAsDataURL(file);
+      currentFile = file;
+    }
+
+    function closeCropper() {
+      cropperOverlay.classList.remove('active');
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }
+
+    fileInput.addEventListener('change', function(e) {
+      if (this.files && this.files.length > 0) {
+        const file = this.files[0];
+        fileNameDisplay.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          updatePreview(e.target.result, file.name);
+        };
+        reader.readAsDataURL(file);
+        openCropper(file);
+      } else {
+        fileNameDisplay.textContent = 'no file chosen';
+        updatePreview(null, null);
+      }
+    });
+
+    uploadArea.addEventListener('click', function(e) {
+      if (e.target.tagName !== 'INPUT') {
+        fileInput.click();
+      }
+    });
+
+    confirmCropBtn.addEventListener('click', function() {
+      if (cropper) {
+        const canvas = cropper.getCroppedCanvas({
+          width: 600,
+          height: 400,
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high',
+        });
+        if (canvas) {
+          canvas.toBlob(function(blob) {
+            const croppedFile = new File([blob], currentFile ? currentFile.name : 'flag.png', {
+              type: 'image/png',
+              lastModified: Date.now(),
+            });
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            fileInput.files = dataTransfer.files;
+            fileNameDisplay.textContent = croppedFile.name + ' (cropped)';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              updatePreview(e.target.result, croppedFile.name + ' (cropped 3:2)');
+            };
+            reader.readAsDataURL(croppedFile);
+            
+            const hint = document.querySelector('.crop-hint');
+            hint.style.opacity = '1';
+            hint.style.color = '#6a8c6a';
+            hint.innerHTML = '<i class="fas fa-check-circle"></i> crop applied (3:2)';
+            setTimeout(() => {
+              hint.style.opacity = '0.6';
+              hint.style.color = '#7a705a';
+              hint.innerHTML = '<i class="fas fa-crop-alt"></i> crop to fixed 3:2 ratio (click file to crop)';
+            }, 3000);
+          }, 'image/png');
+        }
+        closeCropper();
+      }
+    });
+
+    cancelCropBtn.addEventListener('click', function() {
+      closeCropper();
+      fileInput.value = '';
+      fileNameDisplay.textContent = 'no file chosen';
+      updatePreview(null, null);
+    });
+
+    cropperOverlay.addEventListener('click', function(e) {
+      if (e.target === cropperOverlay) {
+        closeCropper();
+        fileInput.value = '';
+        fileNameDisplay.textContent = 'no file chosen';
+        updatePreview(null, null);
+      }
+    });
+
+    // ---- Load and initialize map, then paint taken countries red ----
+    async function loadMap() {
+      try {
+        const svgText = await fetch('world.svg').then(r => r.text());
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
+        const svg = svgDoc.querySelector('svg');
+        if (!svg) throw new Error('Could not parse world.svg');
+
+        svg.querySelectorAll('script').forEach(s => s.remove());
+
+        // Ask Supabase which countries are already claimed
+        const { data: rows, error } = await supabase.from('countries').select('id,name,owner_id');
+        if (error) console.error('Could not load country claims:', error.message);
+        const claimed = {};
+        (rows || []).forEach(r => { if (r.owner_id) claimed[r.id] = r; });
+
+        const countries = svg.querySelectorAll('.country');
+        countries.forEach(country => {
+          const id = country.id;
+          const isTaken = !!claimed[id];
+          countryData[id] = { id, name: claimed[id] ? claimed[id].name : null, taken: isTaken };
+
+          if (isTaken) {
+            // Mark red and make it unselectable
+            country.style.fill = '#b5251f';
+            country.style.opacity = '0.9';
+            country.style.cursor = 'not-allowed';
+            country.style.pointerEvents = 'none';
+            country.classList.add('country-taken');
+          } else {
+            country.addEventListener('click', function(e) {
+              e.stopPropagation();
+              selectCountry(this.id);
+            });
+          }
+
+          country.addEventListener('mouseenter', function() {
+            const info = document.getElementById('mapSelectionInfo');
+            if (!info) return;
+            const d = countryData[this.id];
+            info.innerHTML = d.taken
+              ? `<span class="selected-country">${this.id}</span> — already claimed`
+              : `<span class="selected-country">${this.id}</span> — click to select`;
+          });
+          country.addEventListener('mouseleave', function() {
+            const info = document.getElementById('mapSelectionInfo');
+            if (!info) return;
+            if (selectedCountryId) {
+              info.innerHTML = `Selected: <span class="selected-country">${selectedCountryId}</span>`;
+            } else {
+              info.innerHTML = 'Click on an available (non-red) country to select it';
+            }
+          });
+        });
+
+        mapContainer.innerHTML = '';
+        mapContainer.appendChild(svg);
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'map-selection-info';
+        infoDiv.id = 'mapSelectionInfo';
+        infoDiv.innerHTML = 'Click on an available (non-red) country to select it';
+        mapContainer.appendChild(infoDiv);
+
+        mapLoading.style.display = 'none';
+      } catch (err) {
+        console.error('Error loading map:', err);
+        mapLoading.innerHTML = `
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #b55a5a;"></i>
+          <span style="color: #b55a5a;">Failed to load map. Make sure world.svg is next to this file.</span>
+        `;
+      }
+    }
+
+    // ---- Select country function (available countries only) ----
+    function selectCountry(countryId) {
+      const data = countryData[countryId];
+      if (!data || data.taken) return;
+
+      if (selectedCountryId) {
+        const prev = document.getElementById(selectedCountryId);
+        if (prev) prev.classList.remove('selected');
+      }
+      selectedCountryId = countryId;
+      const current = document.getElementById(countryId);
+      if (current) current.classList.add('selected');
+
+      const info = document.getElementById('mapSelectionInfo');
+      if (info) info.innerHTML = `Selected: <span class="selected-country">${countryId}</span>`;
+    }
+
+    // ==================================================================
+    // ---- Auth gate: this page only works if the user has clicked a
+    // valid confirmation link (Supabase auto-detects the session from
+    // the URL and stores it, so by the time this runs we just check it).
+    // ==================================================================
+    const authGate = document.getElementById('authGate');
+    const signupFormEl = document.getElementById('signupForm');
+    let currentUserId = null;
+
+    (async function initAuthGate() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        authGate.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Open this page from the confirmation link in your email.<br><br><a href="login.html" style="color:#c9b382;">Already confirmed? Log in</a>';
+        return;
+      }
+      currentUserId = session.user.id;
+
+      // If this user already has a profile, they've already finished setup.
+      const { data: existingProfile } = await supabase.from('profiles').select('username').eq('id', currentUserId).maybeSingle();
+      if (existingProfile) {
+        authGate.innerHTML = '<i class="fas fa-check-circle"></i> Your empire is already set up.<br><br><a href="login.html" style="color:#c9b382;">Go to login</a>';
+        return;
+      }
+
+      authGate.style.display = 'none';
+      signupFormEl.style.display = 'flex';
+      loadMap();
+    })();
+
+    // ==================================================================
+    // ---- Finish setup: username + country claim ----
+    // ==================================================================
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearMessage();
+
+      if (!currentUserId) {
+        showMessage('Not signed in — open this page from your confirmation email.', 'error');
+        return;
+      }
+
+      const username = usernameInput.value.trim();
+      if (!username) {
+        showMessage('Choose a username.', 'error');
+        return;
+      }
+      if (!selectedCountryId) {
+        showMessage('Select an available (non-red) country on the map.', 'error');
+        return;
+      }
+      const countryName = countryNameInput.value.trim();
+      if (!countryName) {
+        showMessage('Enter a name for your country.', 'error');
+        return;
+      }
+
+      setLoading(true, 'founding...');
+
+      // Create the profile row (username uniqueness enforced by DB constraint)
+      const { error: profileErr } = await supabase.from('profiles').insert({ id: currentUserId, username });
+      if (profileErr) {
+        setLoading(false);
+        showMessage(profileErr.message.includes('duplicate') ? 'That username was just taken — pick another and try again.' : profileErr.message, 'error');
+        return;
+      }
+
+      // Upload flag if one was chosen
+      let flagUrl = null;
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const path = currentUserId + '/' + Date.now() + '_' + file.name;
+        const { error: upErr } = await supabase.storage.from('flags').upload(path, file);
+        if (!upErr) {
+          flagUrl = supabase.storage.from('flags').getPublicUrl(path).data.publicUrl;
+        }
+      }
+
+      // Claim the country (DB enforces: unique name, unique owner, country not already taken)
+      const { error: claimErr } = await supabase.rpc('claim_country', {
+        p_country_id: selectedCountryId,
+        p_country_name: countryName,
+        p_flag_url: flagUrl
+      });
+      setLoading(false);
+
+      if (claimErr) {
+        showMessage('Profile created, but claiming that country failed: ' + claimErr.message + ' — refresh and try another.', 'error');
+        return;
+      }
+
+      showMessage('🌍 Empire founded! Redirecting to login...', 'success');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+    });
+
+    console.log('🏛️  IMPERIUM · complete-profile — Supabase-backed');
+  })();
+</script>
+</body>
+</html>
