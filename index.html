@@ -1,1 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOVEREIGN · The Grand Strategy Game</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,500&family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="logstyle.css" />
+  <style>
+    /* Additional styles for index page */
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b0e14;
+      font-family: 'Cinzel', serif;
+      padding: 1.5rem;
+      position: relative;
+      overflow-x: hidden;
+    }
 
+    /* Darker overlay for better readability */
+    .world-bg {
+      opacity: 0.6;
+    }
+
+    /* Main container */
+    .index-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      gap: 3rem;
+      align-items: flex-start;
+      padding: 1rem 0;
+    }
+
+    /* Left content area */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Hero card */
+    .hero-card {
+      background: rgba(18, 22, 30, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 3rem 1rem 3rem 1rem;
+      border: 1px solid rgba(200, 180, 140, 0.15);
+      padding: 4rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+      animation: cardEntry 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(200, 180, 140, 0.03), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Game title */
+    .game-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 5rem;
+      letter-spacing: 12px;
+      color: #e3d6b0;
+      text-shadow: 0 4px 40px rgba(180, 140, 80, 0.2), 0 2px 12px rgba(0,0,0,0.6);
+      margin-bottom: 0.5rem;
+      position: relative;
+    }
+
+    .game-title .accent {
+      color: #c9b382;
+      text-shadow: 0 0 60px rgba(200, 180, 140, 0.1);
+    }
+
+    .game-title-sub {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      color: #7a705a;
+      letter-spacing: 8px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(200, 180, 140, 0.1);
+      padding-bottom: 1.5rem;
+    }
+
+    /* Description */
+    .game-description {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      color: #b8a88a;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.3px;
+    }
+
+    .game-description strong {
+      color: #d4c09a;
+      font-weight: 500;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .btn-hero {
+      background: transparent;
+      border: 1px solid rgba(200, 180, 140, 0.2);
+      color: #e3d6b0;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      letter-spacing: 3px;
+      padding: 0.9rem 2rem;
+      border-radius: 2rem 0.5rem 2rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      background: rgba(200, 180, 140, 0.03);
+    }
+
+    .btn-hero:hover {
+      background: rgba(200, 180, 140, 0.08);
+      border-color: #c9b382;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(200, 180, 140, 0.05);
+    }
+
+    .btn-hero.primary {
+      background: rgba(200, 180, 140, 0.08);
+      border-color: #c9b382;
+      font-size: 1.1rem;
+      padding: 1.2rem 3rem;
+      letter-spacing: 6px;
+      box-shadow: 0 4px 30px rgba(200, 180, 140, 0.05);
+    }
+
+    .btn-hero.primary:hover {
+      background: rgba(200, 180, 140, 0.15);
+      border-color: #e3d6b0;
+      box-shadow: 0 8px 50px rgba(200, 180, 140, 0.1);
+      transform: translateY(-3px) scale(1.02);
+    }
+
+    .btn-hero .fa-chevron-right {
+      margin-left: 8px;
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+
+    /* Footer info */
+    .footer-info {
+      border-top: 1px solid rgba(200, 180, 140, 0.08);
+      padding-top: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .project-by {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      color: #5a5040;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-by strong {
+      color: #7a705a;
+      font-weight: 400;
+      letter-spacing: 3px;
+    }
+
+    .contributors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 1.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .contributors span {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      color: #5a5040;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+    }
+
+    .contributors span i {
+      margin-right: 4px;
+      font-size: 0.5rem;
+      color: #7a705a;
+    }
+
+    /* ===== VERTICAL NAVBAR (right side) ===== */
+    .vertical-nav {
+      flex-shrink: 0;
+      width: 200px;
+      position: sticky;
+      top: 2rem;
+      background: rgba(18, 22, 30, 0.6);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 2rem 0.5rem 2rem 0.5rem;
+      border: 1px solid rgba(200, 180, 140, 0.1);
+      padding: 2rem 0.5rem;
+      animation: cardEntry 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+    }
+
+    .vertical-nav .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.7rem 1.2rem;
+      color: #7a705a;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 1rem 0.3rem 1rem 0.3rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .vertical-nav .nav-item:hover {
+      color: #e3d6b0;
+      background: rgba(200, 180, 140, 0.05);
+    }
+
+    .vertical-nav .nav-item i {
+      width: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #5a5040;
+      transition: 0.3s;
+    }
+
+    .vertical-nav .nav-item:hover i {
+      color: #c9b382;
+    }
+
+    .vertical-nav .nav-item .nav-badge {
+      margin-left: auto;
+      font-size: 0.5rem;
+      color: #3a3530;
+      letter-spacing: 1px;
+    }
+
+    .vertical-nav .nav-divider {
+      height: 1px;
+      background: linear-gradient(to right, rgba(200, 180, 140, 0.1), transparent);
+      margin: 0.8rem 1.2rem;
+    }
+
+    .vertical-nav .nav-item.active {
+      color: #e3d6b0;
+      background: rgba(200, 180, 140, 0.06);
+    }
+
+    .vertical-nav .nav-item.active i {
+      color: #c9b382;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .index-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2rem;
+      }
+
+      .vertical-nav {
+        width: 100%;
+        position: relative;
+        top: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 1.2rem 0.5rem;
+        gap: 0.2rem;
+        border-radius: 1.5rem 0.5rem 1.5rem 0.5rem;
+      }
+
+      .vertical-nav .nav-item {
+        padding: 0.5rem 1rem;
+        font-size: 0.6rem;
+      }
+
+      .vertical-nav .nav-divider {
+        display: none;
+      }
+
+      .game-title {
+        font-size: 3.5rem;
+        letter-spacing: 8px;
+      }
+
+      .hero-card {
+        padding: 2.5rem 1.8rem;
+      }
+
+      .btn-hero.primary {
+        font-size: 0.9rem;
+        padding: 1rem 2rem;
+        letter-spacing: 4px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .game-title {
+        font-size: 2.8rem;
+        letter-spacing: 6px;
+      }
+
+      .hero-card {
+        padding: 1.8rem 1.2rem;
+        border-radius: 2rem 0.5rem 2rem 0.5rem;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .btn-hero {
+        text-align: center;
+        justify-content: center;
+      }
+
+      .vertical-nav .nav-item {
+        font-size: 0.55rem;
+        padding: 0.4rem 0.7rem;
+      }
+
+      .vertical-nav .nav-item i {
+        font-size: 0.7rem;
+        width: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="world-bg"></div>
+
+  <!-- Symbols overlay -->
+  <div class="symbol-overlay">
+    <span>☭</span> <span>★</span> <span>☭</span> <span>★</span> <span>☭</span> <span>★</span>
+    <span>☭</span> <span>★</span> <span>☭</span> <span>★</span> <span>☭</span> <span>★</span>
+  </div>
+
+  <!-- Main Container -->
+  <div class="index-container">
+    <!-- Left: Main Content -->
+    <div class="main-content">
+      <div class="hero-card">
+        <!-- Game Title -->
+        <h1 class="game-title">
+          <span class="accent">S</span>OVEREIGN
+        </h1>
+        <div class="game-title-sub">⚔️ the grand strategy game ⚔️</div>
+
+        <!-- Description -->
+        <p class="game-description">
+          <strong>SOVEREIGN</strong> is a sprawling country simulation where you 
+          claim your territory, raise your flag, and guide your empire through 
+          the ages. <strong>Forge alliances</strong>, <strong>wage wars</strong>, 
+          and <strong>shape history</strong> in a world of 52 unique nations.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="play.html" class="btn-hero primary">
+            <i class="fas fa-play"></i> Play
+            <i class="fas fa-chevron-right"></i>
+          </a>
+          <a href="signup.html" class="btn-hero">Sign Up</a>
+          <a href="login.html" class="btn-hero">Login</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-info">
+          <div class="project-by">
+            <i class="fas fa-code"></i> A project by <strong>DarkvoyagerLabs</strong>
+          </div>
+          <div class="contributors">
+            <span><i class="fas fa-user"></i> Aetheris</span>
+            <span><i class="fas fa-user"></i> Nyx</span>
+            <span><i class="fas fa-user"></i> Vex</span>
+            <span><i class="fas fa-user"></i> Orpheus</span>
+            <span><i class="fas fa-user"></i> Selene</span>
+            <span><i class="fas fa-user"></i> Titan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Vertical Navbar -->
+    <nav class="vertical-nav">
+      <a href="#" class="nav-item active">
+        <i class="fas fa-compass"></i> World Wiki
+        <span class="nav-badge">NEW</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-newspaper"></i> World News
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-globe"></i> Countries &amp; Maps
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-building"></i> Companies
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a href="#" class="nav-item">
+        <i class="fas fa-question-circle"></i> How to Play
+      </a>
+    </nav>
+  </div>
+</body>
+</html>
