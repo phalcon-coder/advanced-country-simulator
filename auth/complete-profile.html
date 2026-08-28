@@ -407,7 +407,7 @@
     // ---- Load and initialize map, then paint taken countries red ----
     async function loadMap() {
       try {
-        const svgText = await fetch('world.svg').then(r => r.text());
+        const svgText = await fetch('/maps/world.svg').then(r => r.text());
         const parser = new DOMParser();
         const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
         const svg = svgDoc.querySelector('svg');
