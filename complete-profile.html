@@ -70,6 +70,21 @@
 </div>
 <div class="input-hint" id="countryNameHint"><span class="available"><i class="fas fa-check-circle"></i> name available</span></div>
 
+<!-- Currency name -->
+<div class="input-group">
+  <input type="text" id="currencyName" placeholder="Currency name (e.g. Dinar)" required />
+  <i class="fas fa-coins"></i>
+</div>
+
+<!-- Currency symbol -->
+<div class="input-group">
+  <input type="text" id="currencySymbol" placeholder="Currency symbol (e.g. ₫ or D)" maxlength="4" required />
+  <i class="fas fa-hashtag"></i>
+</div>
+<div class="crop-hint" style="text-align:left;">
+  <i class="fas fa-info-circle"></i> A letter, or an emoji/unicode symbol — whatever represents your currency.
+</div>
+
       <!-- Upload flag with preview -->
 <div class="upload-area" id="flagUploadArea">
   <i class="fas fa-cloud-upload-alt"></i>
@@ -185,7 +200,18 @@
     const countryNameInput = document.getElementById('countryFull');
     const countryNameHint = document.getElementById('countryNameHint');
     let countryNameCheckTimer = null;
+
+    // No digits allowed in country names — strip any typed as-you-go
+    countryNameInput.addEventListener('beforeinput', function(e) {
+      if (e.data && /[0-9]/.test(e.data)) {
+        e.preventDefault();
+      }
+    });
     countryNameInput.addEventListener('input', function() {
+      if (/[0-9]/.test(this.value)) {
+        this.value = this.value.replace(/[0-9]/g, '');
+      }
+
       const val = this.value.trim();
       clearTimeout(countryNameCheckTimer);
       if (val.length === 0) {
@@ -212,6 +238,10 @@
         }
       }, 450);
     });
+
+    // ---- Currency fields ----
+    const currencyNameInput = document.getElementById('currencyName');
+    const currencySymbolInput = document.getElementById('currencySymbol');
 
     // ---- Form status message helper ----
     const formMessage = document.getElementById('formMessage');
@@ -393,6 +423,12 @@
 
         const countries = svg.querySelectorAll('.country');
         countries.forEach(country => {
+          // Strip any legacy inline handlers baked into the SVG (e.g. onclick="countryClicked(...)")
+          // so they don't fire and throw — our own listeners below handle everything.
+          country.removeAttribute('onclick');
+          country.removeAttribute('onmouseover');
+          country.removeAttribute('onmouseout');
+
           const id = country.id;
           const isTaken = !!claimed[id];
           countryData[id] = { id, name: claimed[id] ? claimed[id].name : null, taken: isTaken };
@@ -521,6 +557,20 @@
         showMessage('Enter a name for your country.', 'error');
         return;
       }
+      if (/[0-9]/.test(countryName)) {
+        showMessage('Country name cannot contain numbers.', 'error');
+        return;
+      }
+      const currencyName = currencyNameInput.value.trim();
+      if (!currencyName) {
+        showMessage('Enter a name for your currency.', 'error');
+        return;
+      }
+      const currencySymbol = currencySymbolInput.value.trim();
+      if (!currencySymbol) {
+        showMessage('Enter a symbol for your currency (a letter or an emoji).', 'error');
+        return;
+      }
 
       setLoading(true, 'founding...');
 
@@ -547,7 +597,9 @@
       const { error: claimErr } = await supabase.rpc('claim_country', {
         p_country_id: selectedCountryId,
         p_country_name: countryName,
-        p_flag_url: flagUrl
+        p_flag_url: flagUrl,
+        p_currency_name: currencyName,
+        p_currency_symbol: currencySymbol
       });
       setLoading(false);
 
