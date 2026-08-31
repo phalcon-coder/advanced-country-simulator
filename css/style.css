@@ -182,7 +182,7 @@ body {
 }
 
 .game-title-sub::after {
-  content: '✦';
+  content: '★';
   position: absolute;
   right: 0;
   bottom: -0.5rem;
