@@ -588,7 +588,9 @@
         const file = fileInput.files[0];
         const path = currentUserId + '/' + Date.now() + '_' + file.name;
         const { error: upErr } = await supabase.storage.from('flags').upload(path, file);
-        if (!upErr) {
+        if (upErr) {
+          console.error('Flag upload failed:', upErr.message);
+        } else {
           flagUrl = supabase.storage.from('flags').getPublicUrl(path).data.publicUrl;
         }
       }
