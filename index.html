@@ -53,7 +53,7 @@
 
         <!-- Action Buttons -->
         <div class="action-buttons">
-          <a href="play.html" class="btn-hero primary">
+          <a href="auth/login.html" class="btn-hero primary" id="playBtn">
             <i class="fas fa-play"></i> Play
             <i class="fas fa-chevron-right"></i>
           </a>
@@ -107,5 +107,34 @@
       </a>
     </nav>
   </div>
+
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    var SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+    var SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
+  <script>
+    (function() {
+      // The "Play" button's href already points somewhere sensible as a
+      // no-JS fallback. With JS available, we intercept the click and
+      // decide where to send them based on whether they're already logged in.
+      document.getElementById('playBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session) {
+          // Already logged in (Supabase remembers sessions across visits
+          // automatically) — skip straight to the game.
+          window.location.href = 'game.html';
+        } else {
+          window.location.href = 'auth/login.html';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
