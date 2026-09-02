@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SOVEREIGN · Resource Map Editor</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0b0e14; color:#e3d6b0; font-family:system-ui,sans-serif;
+    display:flex; height:100vh; overflow:hidden;
+  }
+  #sidebar {
+    width:280px; flex-shrink:0; background:#12161e; border-right:1px solid #2a2f3a;
+    padding:1rem; overflow-y:auto;
+  }
+  #sidebar h1 { font-size:1rem; letter-spacing:1px; margin-bottom:0.3rem; }
+  #sidebar p.hint { font-size:0.7rem; color:#8a8270; margin-bottom:1rem; line-height:1.4; }
+  .tool-btn {
+    display:flex; align-items:center; gap:0.6rem; width:100%;
+    background:#1a1f2a; border:1px solid #2a2f3a; color:#e3d6b0;
+    padding:0.5rem 0.6rem; margin-bottom:0.4rem; border-radius:0.4rem;
+    cursor:pointer; font-size:0.8rem; text-align:left;
+  }
+  .tool-btn:hover { border-color:#c9b382; }
+  .tool-btn.active { border-color:#c9b382; background:#2a2416; }
+  .tool-btn svg { width:20px; height:20px; flex-shrink:0; }
+  .tool-btn.delete-mode.active { border-color:#b5251f; background:#2a1616; }
+
+  #markerList { margin-top:1rem; border-top:1px solid #2a2f3a; padding-top:0.8rem; }
+  #markerList h2 { font-size:0.75rem; letter-spacing:1px; color:#8a8270; margin-bottom:0.5rem; }
+  .marker-row {
+    display:flex; align-items:center; gap:0.4rem; font-size:0.7rem;
+    padding:0.3rem 0.4rem; border-radius:0.3rem; margin-bottom:0.2rem;
+    background:#161b24;
+  }
+  .marker-row svg { width:14px; height:14px; flex-shrink:0; }
+  .marker-row .country { color:#8a8270; margin-left:auto; }
+  .marker-row button {
+    background:none; border:none; color:#b5251f; cursor:pointer; font-size:0.85rem;
+    padding:0 0.2rem;
+  }
+
+  #actions { margin-top:1rem; display:flex; flex-direction:column; gap:0.4rem; }
+  #actions button {
+    background:#c9b382; border:none; color:#0b0e14; font-weight:600;
+    padding:0.6rem; border-radius:0.4rem; cursor:pointer; font-size:0.75rem;
+  }
+  #actions button.secondary {
+    background:transparent; border:1px solid #6a5f4a; color:#b8a88a;
+  }
+
+  #mapArea {
+    flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center;
+    padding:1.5rem; background:
+      linear-gradient(45deg,#151a22 25%,transparent 25%),
+      linear-gradient(-45deg,#151a22 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,#151a22 75%),
+      linear-gradient(-45deg,transparent 75%,#151a22 75%);
+    background-size:20px 20px;
+    background-color:#0e1218;
+  }
+  #svgWrap { max-width:1100px; width:100%; background:#f4f1e8; border-radius:0.3rem; }
+  #svgWrap svg { width:100%; height:auto; display:block; cursor:crosshair; }
+
+  #status {
+    position:fixed; bottom:1rem; left:calc(280px + 1.5rem); background:#1a1f2a;
+    border:1px solid #2a2f3a; padding:0.5rem 0.9rem; border-radius:0.4rem;
+    font-size:0.75rem; color:#c9b382; display:none;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>RESOURCE MAP EDITOR</h1>
+  <p class="hint">Pick a resource, then click anywhere on the map to drop it. Click an existing marker with "delete mode" on to remove it. When you're done, export the JSON and hand it to the viewer page.</p>
+
+  <div id="palette"></div>
+
+  <div class="tool-btn delete-mode" id="deleteModeBtn">
+    <i>🗑️</i> Delete mode
+  </div>
+
+  <div id="markerList">
+    <h2>PLACED MARKERS (<span id="markerCount">0</span>)</h2>
+    <div id="markerRows"></div>
+  </div>
+
+  <div id="actions">
+    <button id="exportBtn">Copy JSON</button>
+    <button id="downloadBtn" class="secondary">Download resources.json</button>
+    <button id="undoBtn" class="secondary">Undo last</button>
+    <button id="clearBtn" class="secondary">Clear all</button>
+  </div>
+</div>
+
+<div id="mapArea">
+  <div id="svgWrap">
+    <div style="padding:2rem;color:#666;">Loading world.svg...</div>
+  </div>
+</div>
+
+<div id="status"></div>
+
+<script>
+(function() {
+  // ---- Resource type definitions (icon = inline SVG symbol id, matches viewer) ----
+  const RESOURCE_TYPES = [
+    { key: 'petroleum',   label: 'Petroleum (sea/lakes only)', color: '#111111' },
+    { key: 'coal',        label: 'Coal',                        color: '#1a1a1a' },
+    { key: 'iron',        label: 'Iron & Heavy Metals',         color: '#9a9a9a' },
+    { key: 'copper',      label: 'Copper',                      color: '#b5651d' },
+    { key: 'goldsilver',  label: 'Gold & Silver',                color: '#d4af37' },
+    { key: 'raremetal',   label: 'Rare Metals',                 color: '#9c27b0' },
+    { key: 'radioactive', label: 'Radioactive',                 color: '#ffcc00' },
+  ];
+
+  let currentTool = null; // resource key, or null
+  let deleteMode = false;
+  let markers = []; // { id, type, x, y, countryId }
+  let markerSeq = 1;
+  let svgRoot = null;
+
+  // ---- Build the palette buttons ----
+  const palette = document.getElementById('palette');
+  RESOURCE_TYPES.forEach(rt => {
+    const btn = document.createElement('div');
+    btn.className = 'tool-btn';
+    btn.dataset.key = rt.key;
+    btn.innerHTML = `${iconSvgMarkup(rt.key, 20)} <span>${rt.label}</span>`;
+    btn.addEventListener('click', function() {
+      deleteMode = false;
+      document.getElementById('deleteModeBtn').classList.remove('active');
+      currentTool = (currentTool === rt.key) ? null : rt.key;
+      document.querySelectorAll('#palette .tool-btn').forEach(b => b.classList.remove('active'));
+      if (currentTool) btn.classList.add('active');
+      showStatus(currentTool ? ('Click the map to place: ' + rt.label) : '');
+    });
+    palette.appendChild(btn);
+  });
+
+  document.getElementById('deleteModeBtn').addEventListener('click', function() {
+    deleteMode = !deleteMode;
+    this.classList.toggle('active', deleteMode);
+    if (deleteMode) {
+      currentTool = null;
+      document.querySelectorAll('#palette .tool-btn').forEach(b => b.classList.remove('active'));
+      showStatus('Delete mode: click a marker to remove it.');
+    } else {
+      showStatus('');
+    }
+  });
+
+  function showStatus(text) {
+    const s = document.getElementById('status');
+    if (!text) { s.style.display = 'none'; return; }
+    s.style.display = 'block';
+    s.textContent = text;
+  }
+
+  // ---- Small inline SVG icon markup per resource type, reused by viewer too ----
+  function iconSvgMarkup(key, size) {
+    size = size || 16;
+    const paths = {
+      petroleum: `<path d="M8 1 C8 1 3 7 3 10.5 A5 5 0 0 0 13 10.5 C13 7 8 1 8 1 Z" fill="#111"/>`,
+      coal: `<path d="M3 9 C2 7 4 5 6 5.5 C7 3.5 10 3.5 11 5.5 C13 5 14 7.5 12.5 9.5 C13.5 11 11.5 13 9.5 12 C8 13.5 5 13 4.5 11 C2.5 11 2 9.5 3 9 Z" fill="#1a1a1a"/>`,
+      iron: `<rect x="2" y="5.5" width="12" height="5" rx="1.2" fill="#9a9a9a"/><rect x="2" y="5.5" width="12" height="1.6" rx="0.8" fill="#c4c4c4"/>`,
+      copper: `<rect x="2" y="5.5" width="12" height="5" rx="1.2" fill="#b5651d"/><rect x="2" y="5.5" width="12" height="1.6" rx="0.8" fill="#d68a43"/>`,
+      goldsilver: `<rect x="2" y="5.5" width="6" height="5" rx="1" fill="#d4af37"/><rect x="8" y="5.5" width="6" height="5" rx="1" fill="#c0c0c0"/>`,
+      raremetal: `<rect x="3" y="3" width="10" height="10" rx="2.4" fill="#9c27b0"/>`,
+      radioactive: `<circle cx="8" cy="8" r="6.4" fill="#ffcc00"/><circle cx="8" cy="8" r="1.4" fill="#111"/>
+        <path d="M8 8 L8 2.3 A5.7 5.7 0 0 1 12.9 5.3 Z" fill="#111"/>
+        <path d="M8 8 L12.9 10.7 A5.7 5.7 0 0 1 3.1 10.7 Z" fill="#111"/>`,
+    };
+    return `<svg width="${size}" height="${size}" viewBox="0 0 16 16">${paths[key] || ''}</svg>`;
+  }
+  window.iconSvgMarkup = iconSvgMarkup; // exposed for console/debug parity with viewer
+
+  // ---- Load world.svg ----
+  fetch('world.svg').then(r => r.text()).then(svgText => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    svgRoot = doc.querySelector('svg');
+    svgRoot.querySelectorAll('script').forEach(s => s.remove());
+    svgRoot.querySelectorAll('.country').forEach(c => {
+      c.removeAttribute('onclick');
+      c.style.fill = c.style.fill || '#e9e4d4';
+      c.style.stroke = '#333';
+      c.style.strokeWidth = '1.5';
+    });
+
+    // Marker layer group sits on top
+    const markerLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    markerLayer.setAttribute('id', 'markerLayer');
+    svgRoot.appendChild(markerLayer);
+
+    document.getElementById('svgWrap').innerHTML = '';
+    document.getElementById('svgWrap').appendChild(svgRoot);
+
+    svgRoot.addEventListener('click', onMapClick);
+  }).catch(err => {
+    document.getElementById('svgWrap').innerHTML =
+      '<div style="padding:2rem;color:#b55a5a;">Could not load world.svg — make sure it is in the same folder as this file.<br>' + err.message + '</div>';
+  });
+
+  function svgPoint(evt) {
+    const pt = svgRoot.createSVGPoint();
+    pt.x = evt.clientX;
+    pt.y = evt.clientY;
+    const ctm = svgRoot.getScreenCTM().inverse();
+    return pt.matrixTransform(ctm);
+  }
+
+  function findCountryAt(x, y) {
+    const countries = svgRoot.querySelectorAll('.country');
+    for (const c of countries) {
+      try {
+        if (typeof c.isPointInFill === 'function') {
+          const pt = svgRoot.createSVGPoint();
+          pt.x = x; pt.y = y;
+          if (c.isPointInFill(pt)) return c.id;
+        }
+      } catch (e) { /* isPointInFill unsupported — skip auto-detect */ }
+    }
+    return null; // sea / no country under point
+  }
+
+  function onMapClick(evt) {
+    const target = evt.target;
+    const p = svgPoint(evt);
+
+    if (deleteMode) {
+      const markerEl = target.closest('[data-marker-id]');
+      if (markerEl) {
+        const id = markerEl.getAttribute('data-marker-id');
+        markers = markers.filter(m => m.id !== id);
+        markerEl.remove();
+        renderMarkerList();
+      }
+      return;
+    }
+
+    if (!currentTool) {
+      showStatus('Pick a resource type from the left first.');
+      return;
+    }
+
+    const countryId = findCountryAt(p.x, p.y);
+    const marker = { id: 'm' + (markerSeq++), type: currentTool, x: +p.x.toFixed(1), y: +p.y.toFixed(1), countryId };
+    markers.push(marker);
+    drawMarker(marker);
+    renderMarkerList();
+  }
+
+  function drawMarker(marker) {
+    const layer = svgRoot.querySelector('#markerLayer');
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('data-marker-id', marker.id);
+    g.setAttribute('transform', `translate(${marker.x - 8}, ${marker.y - 8})`);
+    g.style.cursor = 'pointer';
+    g.innerHTML = iconSvgMarkup(marker.type, 16);
+    layer.appendChild(g);
+  }
+
+  function renderMarkerList() {
+    document.getElementById('markerCount').textContent = markers.length;
+    const rows = document.getElementById('markerRows');
+    rows.innerHTML = '';
+    markers.forEach(m => {
+      const rt = RESOURCE_TYPES.find(r => r.key === m.type);
+      const row = document.createElement('div');
+      row.className = 'marker-row';
+      row.innerHTML = `${iconSvgMarkup(m.type, 14)} <span>${rt ? rt.label : m.type}</span>
+        <span class="country">${m.countryId || 'sea'}</span>
+        <button data-del="${m.id}">✕</button>`;
+      row.querySelector('button').addEventListener('click', function() {
+        markers = markers.filter(mk => mk.id !== m.id);
+        const el = svgRoot.querySelector(`[data-marker-id="${m.id}"]`);
+        if (el) el.remove();
+        renderMarkerList();
+      });
+      rows.appendChild(row);
+    });
+  }
+
+  document.getElementById('undoBtn').addEventListener('click', function() {
+    const last = markers.pop();
+    if (last) {
+      const el = svgRoot.querySelector(`[data-marker-id="${last.id}"]`);
+      if (el) el.remove();
+      renderMarkerList();
+    }
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function() {
+    if (!confirm('Remove all placed markers?')) return;
+    markers = [];
+    svgRoot.querySelector('#markerLayer').innerHTML = '';
+    renderMarkerList();
+  });
+
+  function exportJson() {
+    return JSON.stringify(markers.map(m => ({
+      type: m.type, x: m.x, y: m.y, countryId: m.countryId
+    })), null, 2);
+  }
+
+  document.getElementById('exportBtn').addEventListener('click', function() {
+    const json = exportJson();
+    navigator.clipboard.writeText(json).then(() => {
+      showStatus('Copied ' + markers.length + ' markers to clipboard.');
+      setTimeout(() => showStatus(''), 2000);
+    }).catch(() => {
+      alert(json); // fallback: show it so it can be manually copied
+    });
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', function() {
+    const blob = new Blob([exportJson()], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'resources.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+})();
+</script>
+</body>
+</html>

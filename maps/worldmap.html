@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SOVEREIGN · World Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#0b0e14; color:#e3d6b0; font-family:'Cinzel',serif;
+    padding:1.5rem;
+  }
+  h1 { text-align:center; letter-spacing:4px; font-size:1.6rem; margin-bottom:1rem; color:#e3d6b0; }
+
+  #layout { display:flex; gap:1.5rem; max-width:1400px; margin:0 auto; flex-wrap:wrap; }
+  #mapWrap { flex:1; min-width:320px; background:#f4f1e8; border-radius:0.5rem; border:1px solid rgba(200,180,140,0.25); overflow:hidden; }
+  #mapWrap svg { width:100%; height:auto; display:block; }
+
+  #panel {
+    width:300px; flex-shrink:0; background:#12161e; border:1px solid rgba(200,180,140,0.2);
+    border-radius:0.5rem; padding:1rem; font-size:0.8rem; align-self:flex-start;
+  }
+  #panel h2 { font-size:0.85rem; letter-spacing:2px; color:#c9b382; margin-bottom:0.8rem; }
+  #panelBody { color:#b8a88a; line-height:1.5; }
+  #panelBody .placeholder { color:#5a5040; font-size:0.75rem; }
+
+  .flag-img { width:100%; max-width:220px; border-radius:0.3rem; border:1px solid rgba(200,180,140,0.3); margin-bottom:0.6rem; display:block; }
+  .country-name { color:#e3d6b0; font-size:1.1rem; font-weight:700; margin-bottom:0.3rem; }
+  .country-meta { font-size:0.75rem; color:#8a8270; margin-bottom:0.2rem; }
+  .unclaimed-badge { display:inline-block; background:rgba(106,140,106,0.15); color:#a9d0a9; border:1px solid rgba(106,140,106,0.4); padding:0.2rem 0.5rem; border-radius:0.3rem; font-size:0.7rem; }
+
+  .resource-name { color:#e3d6b0; font-size:1rem; font-weight:700; margin-bottom:0.3rem; }
+
+  #legend { max-width:1400px; margin:1.5rem auto 0; display:flex; flex-wrap:wrap; gap:0.8rem; justify-content:center; }
+  .legend-item { display:flex; align-items:center; gap:0.4rem; font-size:0.7rem; color:#8a8270; }
+  .legend-item svg { width:16px; height:16px; }
+
+  #mapContainer { cursor:default; }
+  .country { cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>SOVEREIGN &middot; WORLD MAP</h1>
+
+<div id="layout">
+  <div id="mapWrap"><div style="padding:2rem;color:#666;">Loading map...</div></div>
+  <div id="panel">
+    <h2>DETAILS</h2>
+    <div id="panelBody"><span class="placeholder">Click a country or a resource icon on the map.</span></div>
+  </div>
+</div>
+
+<div id="legend"></div>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  var SUPABASE_URL = 'https://YOUR-PROJECT-REF.supabase.co';
+  var SUPABASE_ANON_KEY = 'YOUR_PUBLIC_ANON_KEY';
+  var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
+
+<script>
+(function() {
+  // ---- Same resource definitions/icons as the editor, kept in sync manually ----
+  const RESOURCE_TYPES = {
+    petroleum:   { label: 'Petroleum' },
+    coal:        { label: 'Coal' },
+    iron:        { label: 'Iron & Heavy Metals' },
+    copper:      { label: 'Copper' },
+    goldsilver:  { label: 'Gold & Silver' },
+    raremetal:   { label: 'Rare Metals' },
+    radioactive: { label: 'Radioactive Materials' },
+  };
+
+  function iconSvgMarkup(key, size) {
+    size = size || 16;
+    const paths = {
+      petroleum: `<path d="M8 1 C8 1 3 7 3 10.5 A5 5 0 0 0 13 10.5 C13 7 8 1 8 1 Z" fill="#111"/>`,
+      coal: `<path d="M3 9 C2 7 4 5 6 5.5 C7 3.5 10 3.5 11 5.5 C13 5 14 7.5 12.5 9.5 C13.5 11 11.5 13 9.5 12 C8 13.5 5 13 4.5 11 C2.5 11 2 9.5 3 9 Z" fill="#1a1a1a"/>`,
+      iron: `<rect x="2" y="5.5" width="12" height="5" rx="1.2" fill="#9a9a9a"/><rect x="2" y="5.5" width="12" height="1.6" rx="0.8" fill="#c4c4c4"/>`,
+      copper: `<rect x="2" y="5.5" width="12" height="5" rx="1.2" fill="#b5651d"/><rect x="2" y="5.5" width="12" height="1.6" rx="0.8" fill="#d68a43"/>`,
+      goldsilver: `<rect x="2" y="5.5" width="6" height="5" rx="1" fill="#d4af37"/><rect x="8" y="5.5" width="6" height="5" rx="1" fill="#c0c0c0"/>`,
+      raremetal: `<rect x="3" y="3" width="10" height="10" rx="2.4" fill="#9c27b0"/>`,
+      radioactive: `<circle cx="8" cy="8" r="6.4" fill="#ffcc00"/><circle cx="8" cy="8" r="1.4" fill="#111"/>
+        <path d="M8 8 L8 2.3 A5.7 5.7 0 0 1 12.9 5.3 Z" fill="#111"/>
+        <path d="M8 8 L12.9 10.7 A5.7 5.7 0 0 1 3.1 10.7 Z" fill="#111"/>`,
+    };
+    return `<svg width="${size}" height="${size}" viewBox="0 0 16 16">${paths[key] || ''}</svg>`;
+  }
+
+  // ---- Legend ----
+  const legend = document.getElementById('legend');
+  Object.keys(RESOURCE_TYPES).forEach(key => {
+    const el = document.createElement('div');
+    el.className = 'legend-item';
+    el.innerHTML = iconSvgMarkup(key, 16) + '<span>' + RESOURCE_TYPES[key].label + '</span>';
+    legend.appendChild(el);
+  });
+
+  const panelBody = document.getElementById('panelBody');
+
+  function showResourceInfo(type, countryId) {
+    const rt = RESOURCE_TYPES[type];
+    panelBody.innerHTML = `
+      <div class="resource-name">${iconSvgMarkup(type, 20)} ${rt ? rt.label : type}</div>
+      <div class="country-meta">${countryId ? ('Found in: ' + countryId) : 'Found in international waters'}</div>
+    `;
+  }
+
+  async function showCountryInfo(countryId) {
+    panelBody.innerHTML = '<span class="placeholder">Loading...</span>';
+    const { data, error } = await supabase
+      .from('countries')
+      .select('id,name,owner_id,flag_url,currency_name,currency_symbol')
+      .eq('id', countryId)
+      .maybeSingle();
+
+    if (error || !data || !data.owner_id) {
+      panelBody.innerHTML = `
+        <div class="country-name">${countryId}</div>
+        <span class="unclaimed-badge">Unclaimed territory</span>
+      `;
+      return;
+    }
+
+    panelBody.innerHTML = `
+      ${data.flag_url ? `<img class="flag-img" src="${data.flag_url}" alt="${data.name} flag" />` : ''}
+      <div class="country-name">${data.name || countryId}</div>
+      <div class="country-meta">${countryId}</div>
+      ${data.currency_name ? `<div class="country-meta">Currency: ${data.currency_symbol || ''} ${data.currency_name}</div>` : ''}
+    `;
+  }
+
+  // ---- Load map + resource markers ----
+  Promise.all([
+    fetch('world.svg').then(r => r.text()),
+    fetch('resources.json').then(r => r.ok ? r.json() : []).catch(() => [])
+  ]).then(([svgText, resources]) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svg = doc.querySelector('svg');
+    svg.querySelectorAll('script').forEach(s => s.remove());
+
+    svg.querySelectorAll('.country').forEach(c => {
+      c.removeAttribute('onclick');
+      c.removeAttribute('onmouseover');
+      c.removeAttribute('onmouseout');
+      c.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showCountryInfo(this.id);
+      });
+    });
+
+    const markerLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    markerLayer.setAttribute('id', 'markerLayer');
+    resources.forEach(r => {
+      const g = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('transform', `translate(${r.x - 8}, ${r.y - 8})`);
+      g.style.cursor = 'pointer';
+      g.innerHTML = iconSvgMarkup(r.type, 16);
+      g.addEventListener('click', function(e) {
+        e.stopPropagation();
+        showResourceInfo(r.type, r.countryId);
+      });
+      markerLayer.appendChild(g);
+    });
+    svg.appendChild(markerLayer);
+
+    document.getElementById('mapWrap').innerHTML = '';
+    document.getElementById('mapWrap').appendChild(svg);
+  }).catch(err => {
+    document.getElementById('mapWrap').innerHTML =
+      '<div style="padding:2rem;color:#b55a5a;">Could not load the map: ' + err.message + '</div>';
+  });
+})();
+</script>
+</body>
+</html>
