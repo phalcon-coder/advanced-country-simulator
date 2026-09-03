@@ -104,12 +104,35 @@
 
   const panelBody = document.getElementById('panelBody');
 
-  function showResourceInfo(type, countryId) {
+  async function showResourceInfo(type, countryId) {
     const rt = RESOURCE_TYPES[type];
-    panelBody.innerHTML = `
-      <div class="resource-name">${iconSvgMarkup(type, 20)} ${rt ? rt.label : type}</div>
-      <div class="country-meta">${countryId ? ('Found in: ' + countryId) : 'Found in international waters'}</div>
-    `;
+    
+    if (countryId) {
+        // Fetch country data to get the name
+        const { data, error } = await supabase
+            .from('countries')
+            .select('name')
+            .eq('id', countryId)
+            .maybeSingle();
+        
+        if (data && data.name) {
+            panelBody.innerHTML = `
+                <div class="resource-name">${iconSvgMarkup(type, 20)} ${rt ? rt.label : type}</div>
+                <div class="country-meta">Found in: ${data.name} (${countryId})</div>
+            `;
+        } else {
+            // Country exists but might be unoccupied (no name)
+            panelBody.innerHTML = `
+                <div class="resource-name">${iconSvgMarkup(type, 20)} ${rt ? rt.label : type}</div>
+                <div class="country-meta">Found in: ${countryId}</div>
+            `;
+        }
+    } else {
+        panelBody.innerHTML = `
+            <div class="resource-name">${iconSvgMarkup(type, 20)} ${rt ? rt.label : type}</div>
+            <div class="country-meta">Found in international waters</div>
+        `;
+    }
   }
 
   async function showCountryInfo(countryId) {
