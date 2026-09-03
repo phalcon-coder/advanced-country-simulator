@@ -3,91 +3,91 @@
     "type": "petroleum",
     "x": 338.8,
     "y": 402.6,
-    "countryId": null
+    "countryId": "country_051"
   },
   {
     "type": "petroleum",
     "x": 553.5,
     "y": 553.5,
-    "countryId": null
+    "countryId": "country_029"
   },
   {
     "type": "petroleum",
     "x": 164.4,
     "y": 509.9,
-    "countryId": null
+    "countryId": "country_028"
   },
   {
     "type": "petroleum",
     "x": 456.2,
     "y": 154.3,
-    "countryId": null
+    "countryId": "country_003"
   },
   {
     "type": "petroleum",
     "x": 288.5,
     "y": 151,
-    "countryId": null
+    "countryId": "country_008"
   },
   {
     "type": "petroleum",
     "x": 681,
     "y": 140.9,
-    "countryId": null
+    "countryId": "country_002"
   },
   {
     "type": "petroleum",
     "x": 895.7,
     "y": 301.9,
-    "countryId": null
+    "countryId": "country_013"
   },
   {
     "type": "petroleum",
     "x": 758.1,
     "y": 348.9,
-    "countryId": null
+    "countryId": "country_018"
   },
   {
     "type": "petroleum",
     "x": 768.2,
     "y": 509.9,
-    "countryId": null
+    "countryId": "country_27"
   },
   {
     "type": "petroleum",
     "x": 808.5,
     "y": 687.7,
-    "countryId": null
+    "countryId": "country_032"
   },
   {
     "type": "petroleum",
     "x": 932.6,
     "y": 852.1,
-    "countryId": null
+    "countryId": "country_036"
   },
   {
     "type": "petroleum",
     "x": 597.1,
     "y": 744.7,
-    "countryId": null
+    "countryId": "country_034"
   },
   {
     "type": "petroleum",
     "x": 670.9,
     "y": 885.6,
-    "countryId": null
+    "countryId": "country_040"
   },
   {
     "type": "petroleum",
     "x": 748.1,
     "y": 1076.8,
-    "countryId": null
+    "countryId": "country_048"
   },
   {
     "type": "petroleum",
     "x": 520,
     "y": 1133.9,
-    "countryId": null
+    "countryId": "country_047"
   },
   {
     "type": "petroleum",
@@ -129,7 +129,7 @@
     "type": "petroleum",
     "x": 979.6,
     "y": 999.7,
-    "countryId": null
+    "countryId": "country_044"
   },
   {
     "type": "coal",
@@ -568,5 +568,113 @@
     "x": 637.4,
     "y": 1056.7,
     "countryId": "country_049"
+  },
+  {
+    "type": "petroleum",
+    "x": 369,
+    "y": 590.4,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 241.5,
+    "y": 714.5,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 483.1,
+    "y": 610.5,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 83.9,
+    "y": 315.3,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 97.3,
+    "y": 83.9,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 97.3,
+    "y": 1073.5,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 218,
+    "y": 1180.8,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 77.2,
+    "y": 744.7,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 993,
+    "y": 523.3,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 865.5,
+    "y": 543.5,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 1117.1,
+    "y": 100.6,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 711.2,
+    "y": 47,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 1076.8,
+    "y": 899,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 1143.9,
+    "y": 660.9,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 875.6,
+    "y": 1187.5,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 1117.1,
+    "y": 1211,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 798.4,
+    "y": 878.9,
+    "countryId": null
+  },
+  {
+    "type": "petroleum",
+    "x": 1140.6,
+    "y": 312,
+    "countryId": null
   }
 ]
