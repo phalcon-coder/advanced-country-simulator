@@ -1,6 +1,35 @@
 /* ============================================================
    STYLE.CSS — Sovereign Main Page Styles
    ============================================================ */
+:root {
+  --bg-void:        #0b0e14;
+  --bg-panel:       #12161e;
+  --bg-panel-raise: #1a1f2a;
+  --bg-inset:       #0e1218;
+
+  --border:         rgba(200, 180, 140, 0.18);
+  --border-strong:  rgba(200, 180, 140, 0.35);
+
+  --gold:           #c9b382;
+  --gold-bright:    #e3d6b0;
+  --text:           #e3d6b0;
+  --text-dim:       #b8a88a;
+  --text-faint:     #7a705a;
+
+  --ok:             #6a8c6a;
+  --ok-bright:      #a9d0a9;
+  --danger:         #b5251f;
+  --danger-bright:  #e0a3a3;
+  --warn:           #d4af37;
+
+  --radius-sm: 0.35rem;
+  --radius-md: 0.6rem;
+  --radius-lg: 1.2rem;
+
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
 
 /* ---- Base body overrides ---- */
 body {
