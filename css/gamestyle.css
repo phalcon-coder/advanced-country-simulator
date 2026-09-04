@@ -34,7 +34,28 @@ body.game-body {
 }
 #topBar .brand i { color: var(--gold); }
 
-#topIcons { display: flex; align-items: center; gap: 0.3rem; }
+/* Hamburger menu button - hidden on desktop */
+#hamburgerBtn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  padding: 0.3rem 0.7rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+#hamburgerBtn:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+#topIcons { 
+  display: flex; 
+  align-items: center; 
+  gap: 0.3rem; 
+}
 .top-icon-btn {
   position: relative;
   width: 38px;
@@ -47,8 +68,13 @@ body.game-body {
   border: 1px solid transparent;
   color: var(--text-dim);
   font-size: 1rem;
+  transition: all 0.2s ease;
 }
-.top-icon-btn:hover { background: rgba(200,180,140,0.08); border-color: var(--border); color: var(--gold-bright); }
+.top-icon-btn:hover { 
+  background: rgba(200,180,140,0.08); 
+  border-color: var(--border); 
+  color: var(--gold-bright); 
+}
 .top-icon-btn .dot {
   position: absolute;
   top: 4px; right: 4px;
@@ -65,18 +91,21 @@ body.game-body {
   flex: 1;
   display: flex;
   min-height: 0;
+  position: relative;
 }
 
 /* ---------- Left sidebar ---------- */
 #leftSidebar {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 #leftSidebar .sidebar-title {
   font-family: var(--font-display);
   font-size: 0.7rem;
@@ -85,8 +114,14 @@ body.game-body {
   padding: 0.9rem 1rem 0.4rem;
   text-transform: uppercase;
 }
-.module-nav { list-style: none; flex: 1; }
-.module-nav li { border-bottom: 1px solid var(--border); }
+.module-nav { 
+  list-style: none; 
+  flex: 1; 
+  overflow-y: auto;
+}
+.module-nav li { 
+  border-bottom: 1px solid var(--border); 
+}
 .module-nav button {
   width: 100%;
   text-align: left;
@@ -99,11 +134,29 @@ body.game-body {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  transition: all 0.15s ease;
 }
-.module-nav button i { width: 16px; text-align: center; color: var(--text-faint); }
-.module-nav button:hover { background: rgba(200,180,140,0.05); color: var(--gold-bright); }
-.module-nav li.active button { background: rgba(200,180,140,0.1); color: var(--gold-bright); border-left: 3px solid var(--gold); padding-left: calc(1rem - 3px); }
-.module-nav li.active button i { color: var(--gold); }
+.module-nav button i { 
+  width: 18px; 
+  text-align: center; 
+  color: var(--text-faint); 
+}
+.module-nav button:hover { 
+  background: rgba(200,180,140,0.05); 
+  color: var(--gold-bright); 
+}
+.module-nav button:hover i {
+  color: var(--gold);
+}
+.module-nav li.active button { 
+  background: rgba(200,180,140,0.1); 
+  color: var(--gold-bright); 
+  border-left: 3px solid var(--gold); 
+  padding-left: calc(1rem - 3px); 
+}
+.module-nav li.active button i { 
+  color: var(--gold); 
+}
 
 #adSlot {
   padding: 0.8rem;
@@ -141,7 +194,7 @@ body.game-body {
 
 /* ---------- Right sidebar: country summary ---------- */
 #rightSidebar {
-  width: 260px;
+  width: 280px;
   flex-shrink: 0;
   background: var(--bg-panel);
   border-left: 1px solid var(--border);
@@ -164,21 +217,53 @@ body.game-body {
   flex-shrink: 0;
   background: var(--bg-inset);
 }
-#rightSidebar .country-flag.placeholder { display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 0.6rem; }
+#rightSidebar .country-flag.placeholder { 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: var(--text-faint); 
+  font-size: 0.6rem; 
+}
 #rightSidebar .country-name {
   font-family: var(--font-display);
   font-size: 0.9rem;
   color: var(--gold-bright);
   line-height: 1.2;
 }
-#rightSidebar .country-id { font-size: 0.65rem; color: var(--text-faint); }
+#rightSidebar .country-id { 
+  font-size: 0.65rem; 
+  color: var(--text-faint); 
+}
 
-.stat-row { display: flex; justify-content: space-between; padding: 0.2rem 0; color: var(--text-dim); }
-.stat-row .val { color: var(--text); }
+.stat-row { 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 0.3rem 0; 
+  color: var(--text-dim); 
+  border-bottom: 1px solid rgba(200,180,140,0.05);
+}
+.stat-row .val { 
+  color: var(--text); 
+  font-weight: 500;
+}
 
-.rs-section { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px solid var(--border); }
-.rs-section-title { font-size: 0.65rem; letter-spacing: 1.5px; color: var(--text-faint); text-transform: uppercase; margin-bottom: 0.4rem; }
-.rs-brief { color: var(--text-dim); font-size: 0.72rem; line-height: 1.4; }
+.rs-section { 
+  margin-top: 0.9rem; 
+  padding-top: 0.7rem; 
+  border-top: 1px solid var(--border); 
+}
+.rs-section-title { 
+  font-size: 0.65rem; 
+  letter-spacing: 1.5px; 
+  color: var(--text-faint); 
+  text-transform: uppercase; 
+  margin-bottom: 0.4rem; 
+}
+.rs-brief { 
+  color: var(--text-dim); 
+  font-size: 0.72rem; 
+  line-height: 1.4; 
+}
 
 #gameClock {
   text-align: center;
@@ -208,12 +293,160 @@ body.game-body {
   letter-spacing: 1px;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 900px) {
-  #leftSidebar { width: 180px; }
-  #rightSidebar { width: 210px; }
+/* ---------- Mobile overlay for sidebar ---------- */
+#sidebarOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
-@media (max-width: 700px) {
-  #rightSidebar { display: none; }
+#sidebarOverlay.active {
+  display: block;
+  opacity: 1;
 }
 
+/* ---------- Responsive ---------- */
+@media (max-width: 1200px) {
+  #leftSidebar { width: 200px; }
+  #rightSidebar { width: 240px; }
+}
+
+@media (max-width: 992px) {
+  #leftSidebar { width: 180px; }
+  #rightSidebar { width: 200px; }
+}
+
+@media (max-width: 768px) {
+  /* Show hamburger, hide left sidebar by default */
+  #hamburgerBtn {
+    display: inline-block;
+  }
+  
+  #leftSidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    transform: translateX(-110%);
+    z-index: 50;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.5);
+    border-right: 1px solid var(--border-strong);
+  }
+  
+  #leftSidebar.open {
+    transform: translateX(0);
+  }
+  
+  #sidebarOverlay.active {
+    display: block;
+    opacity: 1;
+  }
+  
+  /* Right sidebar moves to bottom */
+  #rightSidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 45vh;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 30;
+    border-left: none;
+    border-top: 1px solid var(--border-strong);
+    background: var(--bg-panel);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    padding: 0.8rem;
+    overflow-y: auto;
+  }
+  
+  #rightSidebar.open {
+    transform: translateY(0);
+  }
+  
+  /* Right sidebar toggle handle */
+  #rightSidebar::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    margin: 0 auto 0.8rem;
+    cursor: pointer;
+  }
+  
+  /* Make center area take full width */
+  #centerArea {
+    flex: 1;
+    width: 100%;
+  }
+  
+  /* Hide right sidebar stats on mobile when closed */
+  #rightSidebar .country-header,
+  #rightSidebar .stat-row,
+  #rightSidebar .rs-section,
+  #rightSidebar #gameClock {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  
+  /* Shrink top icons on mobile */
+  .top-icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  
+  /* Adjust loader padding */
+  #loaderArea {
+    padding: 0.8rem;
+  }
+  
+  #loaderTitle {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #leftSidebar {
+    width: 100%;
+    max-width: 320px;
+  }
+  
+  #rightSidebar {
+    max-height: 50vh;
+    padding: 0.6rem;
+  }
+  
+  #rightSidebar .country-header {
+    margin-bottom: 0.5rem;
+  }
+  
+  .stat-row {
+    padding: 0.2rem 0;
+    font-size: 0.7rem;
+  }
+  
+  .top-icon-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  #topBar .brand {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+  }
+  
+  #hamburgerBtn {
+    padding: 0.2rem 0.5rem;
+    font-size: 1rem;
+  }
+}
