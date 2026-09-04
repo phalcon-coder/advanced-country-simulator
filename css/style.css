@@ -44,6 +44,20 @@ body {
   overflow-x: hidden;
 }
 
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-inset); }
+::-webkit-scrollbar-thumb { background: #2a2f3a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a4150; }
+
+.text-faint { color: var(--text-faint); }
+.text-dim { color: var(--text-dim); }
+.hidden { display: none !important; }
+
 /* Darker overlay for better readability */
 .world-bg {
   opacity: 0.6;
