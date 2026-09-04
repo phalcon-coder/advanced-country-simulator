@@ -1,3 +1,150 @@
-<html>
-  hello world
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SOVEREIGN · Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/gamestyle.css" />
+</head>
+<body class="game-body">
+
+<!-- Shown while the auth check + data load happens -->
+<div id="authSplash">
+  <i class="fas fa-crown fa-2x"></i>
+  <div>Loading your empire...</div>
+</div>
+
+<div id="appRoot" class="hidden" style="display:contents;">
+
+  <!-- ================= TOP BAR ================= -->
+  <div id="topBar">
+    <div class="brand"><i class="fas fa-crown"></i> SOVEREIGN</div>
+    <div id="topIcons">
+      <button class="top-icon-btn" id="iconAccount" title="Account details"><i class="fas fa-user"></i></button>
+      <button class="top-icon-btn" id="iconCountry" title="Country details"><i class="fas fa-flag"></i></button>
+      <button class="top-icon-btn" id="iconWiki" title="World Wiki"><i class="fas fa-book"></i></button>
+      <button class="top-icon-btn" id="iconCompanies" title="Companies & Contracts"><i class="fas fa-building-columns"></i></button>
+      <button class="top-icon-btn" id="iconMap" title="World Map"><i class="fas fa-globe"></i></button>
+      <button class="top-icon-btn" id="iconNotifications" title="Notifications"><i class="fas fa-bell"></i><span class="dot"></span></button>
+      <button class="top-icon-btn" id="iconChat" title="Chat"><i class="fas fa-comments"></i><span class="dot"></span></button>
+      <button class="top-icon-btn" id="iconBank" title="Bank"><i class="fas fa-sack-dollar"></i></button>
+    </div>
+  </div>
+
+  <!-- ================= BODY: 3 columns ================= -->
+  <div id="gameBody">
+
+    <!-- ---- Left sidebar: module nav ---- -->
+    <div id="leftSidebar">
+      <div class="sidebar-title">Manage Country</div>
+      <ul class="module-nav">
+        <li data-module="map"><button><i class="fas fa-map"></i> Map</button></li>
+        <li data-module="provinces-cities"><button><i class="fas fa-city"></i> Provinces & Cities</button></li>
+        <li data-module="industries"><button><i class="fas fa-industry"></i> Industries</button></li>
+        <li data-module="power"><button><i class="fas fa-bolt"></i> Power</button></li>
+        <li data-module="transport"><button><i class="fas fa-train"></i> Transport</button></li>
+        <li data-module="defence"><button><i class="fas fa-shield-halved"></i> Defence</button></li>
+        <li data-module="network"><button><i class="fas fa-tower-broadcast"></i> Network</button></li>
+        <li data-module="administration"><button><i class="fas fa-gavel"></i> Administration</button></li>
+        <li data-module="economy-trade"><button><i class="fas fa-coins"></i> Economy & Trade</button></li>
+        <li data-module="diplomacy"><button><i class="fas fa-handshake"></i> Diplomacy</button></li>
+        <li data-module="education"><button><i class="fas fa-graduation-cap"></i> Education</button></li>
+        <li data-module="research"><button><i class="fas fa-flask"></i> Research</button></li>
+        <li data-module="tourism"><button><i class="fas fa-umbrella-beach"></i> Tourism</button></li>
+        <li data-module="entertainment"><button><i class="fas fa-futbol"></i> Entertainment</button></li>
+      </ul>
+      <div id="adSlot">&lt;-- ads --&gt;</div>
+    </div>
+
+    <!-- ---- Center: loader area ---- -->
+    <div id="centerArea">
+      <div id="loaderTitle"><i class="fas fa-map"></i> Map</div>
+      <div id="loaderArea"></div>
+    </div>
+
+    <!-- ---- Right sidebar: country summary ---- -->
+    <div id="rightSidebar">
+      <div class="country-header">
+        <div id="rsFlag" class="country-flag"></div>
+        <div>
+          <div id="rsCountryName" class="country-name">—</div>
+          <div id="rsCountryId" class="country-id">—</div>
+        </div>
+      </div>
+
+      <div class="stat-row"><span>Population</span><span class="val" id="rsPopulation">—</span></div>
+      <div class="stat-row"><span>Happiness Index</span><span class="val" id="rsHappiness">—</span></div>
+      <div class="stat-row"><span>Immigration rate</span><span class="val" id="rsImmigration">—</span></div>
+
+      <div id="gameClock"><i class="fas fa-clock"></i> Game clock & date — TBD</div>
+
+      <div class="stat-row"><span>Balance</span><span class="val" id="rsBalance">—</span></div>
+      <div class="stat-row"><span>Income</span><span class="val" id="rsIncome">—</span></div>
+      <div class="stat-row"><span>Expenditure</span><span class="val" id="rsExpenditure">—</span></div>
+
+      <div class="rs-section">
+        <div class="rs-section-title">Economic status</div>
+        <div class="rs-brief text-faint">No economy system yet</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-section-title">Diplomatic & trade status</div>
+        <div class="rs-brief text-faint">No diplomacy system yet</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-section-title">Defence status</div>
+        <div class="rs-brief text-faint">No defence system yet</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-section-title">Infrastructure status</div>
+        <div class="rs-brief text-faint">No infrastructure system yet</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-section-title">Administration status</div>
+        <div class="rs-brief text-faint">No administration system yet</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- Account details (icon 1) -->
+<div class="modal-overlay" id="accountModal">
+  <div class="modal-box">
+    <h2>Account Details <button class="modal-close">&times;</button></h2>
+    <div class="modal-row"><span class="label">Username</span><span class="value" id="acctUsername">—</span></div>
+    <div class="modal-row"><span class="label">Email</span><span class="value" id="acctEmail">—</span></div>
+  </div>
+</div>
+
+<!-- Country details (icon 2) -->
+<div class="modal-overlay" id="countryModal">
+  <div class="modal-box">
+    <h2>Country Details <button class="modal-close">&times;</button></h2>
+    <div id="countryModalFlag"></div>
+    <div class="modal-row"><span class="label">Name</span><span class="value" id="cmName">—</span></div>
+    <div class="modal-row"><span class="label">Country ID</span><span class="value" id="cmId">—</span></div>
+    <div class="modal-row"><span class="label">Currency</span><span class="value" id="cmCurrency">—</span></div>
+    <div class="modal-row"><span class="label">Overall rating</span><span class="value" id="cmRating">—</span></div>
+  </div>
+</div>
+
+<!-- Supabase client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/state.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+<script src="js/auth.js"></script>
+</body>
 </html>
+  
