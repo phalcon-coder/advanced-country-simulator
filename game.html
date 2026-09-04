@@ -26,7 +26,12 @@
 
   <!-- ================= TOP BAR ================= -->
   <div id="topBar">
-    <div class="brand"><i class="fas fa-crown"></i> SOVEREIGN</div>
+    <div style="display:flex;align-items:center;gap:0.8rem;">
+      <button id="hamburgerBtn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="brand"><i class="fas fa-crown"></i> SOVEREIGN</div>
+    </div>
     <div id="topIcons">
       <button class="top-icon-btn" id="iconAccount" title="Account details"><i class="fas fa-user"></i></button>
       <button class="top-icon-btn" id="iconCountry" title="Country details"><i class="fas fa-flag"></i></button>
@@ -42,11 +47,14 @@
   <!-- ================= BODY: 3 columns ================= -->
   <div id="gameBody">
 
+    <!-- Mobile overlay for sidebar -->
+    <div id="sidebarOverlay"></div>
+
     <!-- ---- Left sidebar: module nav ---- -->
     <div id="leftSidebar">
       <div class="sidebar-title">Manage Country</div>
       <ul class="module-nav">
-        <li data-module="map"><button><i class="fas fa-map"></i> Map</button></li>
+        <li class="active" data-module="map"><button><i class="fas fa-map"></i> Map</button></li>
         <li data-module="provinces-cities"><button><i class="fas fa-city"></i> Provinces & Cities</button></li>
         <li data-module="industries"><button><i class="fas fa-industry"></i> Industries</button></li>
         <li data-module="power"><button><i class="fas fa-bolt"></i> Power</button></li>
@@ -67,13 +75,22 @@
     <!-- ---- Center: loader area ---- -->
     <div id="centerArea">
       <div id="loaderTitle"><i class="fas fa-map"></i> Map</div>
-      <div id="loaderArea"></div>
+      <div id="loaderArea">
+        <!-- Content will be loaded here dynamically -->
+        <div class="empty-state">
+          <i class="fas fa-map"></i>
+          <h3>Select a module</h3>
+          <p>Choose a module from the left sidebar to manage your country's affairs.</p>
+        </div>
+      </div>
     </div>
 
     <!-- ---- Right sidebar: country summary ---- -->
     <div id="rightSidebar">
       <div class="country-header">
-        <div id="rsFlag" class="country-flag"></div>
+        <div id="rsFlag" class="country-flag placeholder">
+          <i class="fas fa-flag"></i>
+        </div>
         <div>
           <div id="rsCountryName" class="country-name">—</div>
           <div id="rsCountryId" class="country-id">—</div>
@@ -145,6 +162,97 @@
 <script src="js/router.js"></script>
 <script src="js/app.js"></script>
 <script src="js/auth.js"></script>
+
+<script>
+// ============================================================
+// Mobile interactions: hamburger menu & right sidebar toggle
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const leftSidebar = document.getElementById('leftSidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const rightSidebar = document.getElementById('rightSidebar');
+  
+  // ---- Hamburger menu toggle ----
+  function toggleSidebar() {
+    leftSidebar.classList.toggle('open');
+    sidebarOverlay.classList.toggle('active');
+    document.body.style.overflow = leftSidebar.classList.contains('open') ? 'hidden' : '';
+  }
+  
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', toggleSidebar);
+  }
+  
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+  }
+  
+  // Close sidebar when clicking a nav item (mobile)
+  document.querySelectorAll('.module-nav button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      if (window.innerWidth <= 768) {
+        leftSidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+  
+  // ---- Right sidebar toggle on mobile ----
+  let rightSidebarOpen = false;
+  
+  if (rightSidebar) {
+    // Click on the top area (handle) to toggle
+    rightSidebar.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768) {
+        const rect = this.getBoundingClientRect();
+        const clickY = e.clientY - rect.top;
+        // If clicking in the top 40px (handle area)
+        if (clickY < 40) {
+          rightSidebarOpen = !rightSidebarOpen;
+          this.classList.toggle('open', rightSidebarOpen);
+        }
+      }
+    });
+    
+    // Also allow closing by clicking outside on mobile
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768 && rightSidebarOpen) {
+        if (!rightSidebar.contains(e.target)) {
+          rightSidebarOpen = false;
+          rightSidebar.classList.remove('open');
+        }
+      }
+    });
+  }
+  
+  // ---- Handle window resize ----
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+      // Reset mobile states
+      leftSidebar.classList.remove('open');
+      sidebarOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      rightSidebar.classList.remove('open');
+      rightSidebarOpen = false;
+    }
+  });
+  
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', function(e) {
+    // Escape key closes sidebars
+    if (e.key === 'Escape') {
+      if (leftSidebar.classList.contains('open')) {
+        toggleSidebar();
+      }
+      if (rightSidebarOpen) {
+        rightSidebarOpen = false;
+        rightSidebar.classList.remove('open');
+      }
+    }
+  });
+});
+</script>
 </body>
 </html>
-  
