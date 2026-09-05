@@ -29,7 +29,6 @@ body.game-body {
   border-bottom: 1px solid var(--border);
   z-index: 20;
   width: 100%;
-  /* Remove any default margins */
   margin: 0;
 }
 
@@ -104,8 +103,8 @@ body.game-body {
   min-height: 0;
   position: relative;
   width: 100%;
-  /* Remove any gaps */
   margin: 0;
+  overflow: hidden; /* Prevent body scrolling on desktop */
 }
 
 /* ---------- Left sidebar ---------- */
@@ -118,8 +117,8 @@ body.game-body {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  /* Remove any margins */
   margin: 0;
+  height: 100%;
 }
 
 #leftSidebar .sidebar-title {
@@ -129,6 +128,7 @@ body.game-body {
   color: var(--text-faint);
   padding: 0.9rem 1rem 0.4rem;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 .module-nav { 
   list-style: none; 
@@ -183,6 +183,7 @@ body.game-body {
   font-size: 0.6rem;
   color: var(--text-faint);
   text-align: center;
+  flex-shrink: 0;
 }
 
 /* ---------- Center loader area ---------- */
@@ -193,6 +194,7 @@ body.game-body {
   flex-direction: column;
   overflow: hidden;
   background: var(--bg-void);
+  height: 100%;
 }
 #loaderTitle {
   padding: 0.8rem 1.2rem;
@@ -223,8 +225,8 @@ body.game-body {
   overflow-y: auto;
   padding: 1rem;
   font-size: 0.78rem;
-  /* Remove any margins */
   margin: 0;
+  height: 100%;
 }
 #rightSidebar .country-header {
   display: flex;
@@ -344,16 +346,26 @@ body.game-body {
 }
 
 @media (max-width: 768px) {
+  /* Allow body scrolling on mobile */
+  body.game-body {
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+  
   /* Remove any body padding/margin */
   body.game-body {
     padding: 0;
     margin: 0;
   }
   
-  /* Top bar full width */
+  /* Top bar stays fixed */
   #topBar {
     padding: 0 0.8rem;
     width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 60;
   }
   
   /* Show hamburger, hide left sidebar by default */
@@ -371,6 +383,7 @@ body.game-body {
     z-index: 50;
     box-shadow: 4px 0 30px rgba(0,0,0,0.5);
     border-right: 1px solid var(--border-strong);
+    height: 100vh;
   }
   
   #leftSidebar.open {
@@ -382,66 +395,68 @@ body.game-body {
     opacity: 1;
   }
   
-  /* Center area takes full width */
+  /* Game body becomes scrollable */
+  #gameBody {
+    flex-direction: column;
+    overflow: visible;
+    height: auto;
+    min-height: calc(100vh - 56px);
+  }
+  
+  /* Center area takes full width and scrolls */
   #centerArea {
-    flex: 1;
+    flex: none;
     width: 100%;
-    min-width: 0;
+    min-height: calc(100vh - 56px);
+    height: auto;
+    overflow: visible;
   }
   
   #loaderArea {
     padding: 0.8rem;
+    overflow: visible;
   }
   
   #loaderTitle {
     font-size: 0.85rem;
     padding: 0.6rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   
-  /* Right sidebar at bottom - full width */
+  /* Right sidebar at bottom - visible and scrollable */
   #rightSidebar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
     width: 100%;
-    max-height: 45vh;
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 30;
+    max-height: none;
+    transform: none;
     border-left: none;
     border-top: 1px solid var(--border-strong);
     background: var(--bg-panel);
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    box-shadow: none;
     padding: 0.8rem;
-    overflow-y: auto;
+    overflow-y: visible;
     margin: 0;
     border-radius: 0;
+    height: auto;
+    flex-shrink: 0;
   }
   
-  #rightSidebar.open {
-    transform: translateY(0);
-  }
-  
-  /* Right sidebar toggle handle */
+  /* Remove the toggle handle since it's always visible */
   #rightSidebar::before {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 3px;
-    background: var(--border-strong);
-    border-radius: 2px;
-    margin: 0 auto 0.8rem;
-    cursor: pointer;
+    display: none;
   }
   
-  /* Hide right sidebar stats on mobile when closed */
+  /* Right sidebar is always visible on mobile now */
   #rightSidebar .country-header,
   #rightSidebar .stat-row,
   #rightSidebar .rs-section,
   #rightSidebar #gameClock {
     opacity: 1;
-    transition: opacity 0.3s ease;
   }
   
   /* Shrink top icons on mobile */
@@ -465,7 +480,6 @@ body.game-body {
   }
   
   #rightSidebar {
-    max-height: 50vh;
     padding: 0.6rem;
   }
   
