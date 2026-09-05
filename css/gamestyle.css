@@ -3,11 +3,18 @@
    center loader area, right country-summary panel.
    ============================================================ */
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body.game-body {
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--bg-void);
 }
 
 /* ---------- Top bar ---------- */
@@ -21,7 +28,11 @@ body.game-body {
   background: var(--bg-panel);
   border-bottom: 1px solid var(--border);
   z-index: 20;
+  width: 100%;
+  /* Remove any default margins */
+  margin: 0;
 }
+
 #topBar .brand {
   display: flex;
   align-items: center;
@@ -92,6 +103,9 @@ body.game-body {
   display: flex;
   min-height: 0;
   position: relative;
+  width: 100%;
+  /* Remove any gaps */
+  margin: 0;
 }
 
 /* ---------- Left sidebar ---------- */
@@ -104,6 +118,8 @@ body.game-body {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Remove any margins */
+  margin: 0;
 }
 
 #leftSidebar .sidebar-title {
@@ -118,9 +134,12 @@ body.game-body {
   list-style: none; 
   flex: 1; 
   overflow-y: auto;
+  padding: 0;
+  margin: 0;
 }
 .module-nav li { 
-  border-bottom: 1px solid var(--border); 
+  border-bottom: 1px solid var(--border);
+  margin: 0;
 }
 .module-nav button {
   width: 100%;
@@ -173,6 +192,7 @@ body.game-body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--bg-void);
 }
 #loaderTitle {
   padding: 0.8rem 1.2rem;
@@ -185,11 +205,13 @@ body.game-body {
   align-items: center;
   gap: 0.6rem;
   flex-shrink: 0;
+  background: var(--bg-panel);
 }
 #loaderArea {
   flex: 1;
   overflow-y: auto;
   padding: 1.2rem;
+  background: var(--bg-void);
 }
 
 /* ---------- Right sidebar: country summary ---------- */
@@ -201,6 +223,8 @@ body.game-body {
   overflow-y: auto;
   padding: 1rem;
   font-size: 0.78rem;
+  /* Remove any margins */
+  margin: 0;
 }
 #rightSidebar .country-header {
   display: flex;
@@ -320,6 +344,18 @@ body.game-body {
 }
 
 @media (max-width: 768px) {
+  /* Remove any body padding/margin */
+  body.game-body {
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Top bar full width */
+  #topBar {
+    padding: 0 0.8rem;
+    width: 100%;
+  }
+  
   /* Show hamburger, hide left sidebar by default */
   #hamburgerBtn {
     display: inline-block;
@@ -346,7 +382,23 @@ body.game-body {
     opacity: 1;
   }
   
-  /* Right sidebar moves to bottom */
+  /* Center area takes full width */
+  #centerArea {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+  }
+  
+  #loaderArea {
+    padding: 0.8rem;
+  }
+  
+  #loaderTitle {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+  
+  /* Right sidebar at bottom - full width */
   #rightSidebar {
     position: fixed;
     bottom: 0;
@@ -363,6 +415,8 @@ body.game-body {
     box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
     padding: 0.8rem;
     overflow-y: auto;
+    margin: 0;
+    border-radius: 0;
   }
   
   #rightSidebar.open {
@@ -381,12 +435,6 @@ body.game-body {
     cursor: pointer;
   }
   
-  /* Make center area take full width */
-  #centerArea {
-    flex: 1;
-    width: 100%;
-  }
-  
   /* Hide right sidebar stats on mobile when closed */
   #rightSidebar .country-header,
   #rightSidebar .stat-row,
@@ -403,14 +451,10 @@ body.game-body {
     font-size: 0.85rem;
   }
   
-  /* Adjust loader padding */
-  #loaderArea {
-    padding: 0.8rem;
-  }
-  
-  #loaderTitle {
-    font-size: 0.85rem;
-    padding: 0.6rem 1rem;
+  /* Make sure game body fills properly */
+  #gameBody {
+    width: 100%;
+    margin: 0;
   }
 }
 
@@ -445,8 +489,16 @@ body.game-body {
     letter-spacing: 2px;
   }
   
+  #topBar {
+    padding: 0 0.5rem;
+  }
+  
   #hamburgerBtn {
     padding: 0.2rem 0.5rem;
     font-size: 1rem;
   }
-}
+  
+  #loaderArea {
+    padding: 0.6rem;
+  }
+     }
