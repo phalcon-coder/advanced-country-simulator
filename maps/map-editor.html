@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SOVEREIGN · Resource Map Editor</title>
+<title>SOVEREIGN · Map Editor</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -11,10 +11,11 @@
     display:flex; height:100vh; overflow:hidden;
   }
   #sidebar {
-    width:280px; flex-shrink:0; background:#12161e; border-right:1px solid #2a2f3a;
+    width:300px; flex-shrink:0; background:#12161e; border-right:1px solid #2a2f3a;
     padding:1rem; overflow-y:auto;
   }
   #sidebar h1 { font-size:1rem; letter-spacing:1px; margin-bottom:0.3rem; }
+  #sidebar h2.section-title { font-size:0.75rem; letter-spacing:1px; color:#8a8270; margin:1rem 0 0.5rem; border-top:1px solid #2a2f3a; padding-top:0.8rem; }
   #sidebar p.hint { font-size:0.7rem; color:#8a8270; margin-bottom:1rem; line-height:1.4; }
   .tool-btn {
     display:flex; align-items:center; gap:0.6rem; width:100%;
@@ -26,33 +27,40 @@
   .tool-btn.active { border-color:#c9b382; background:#2a2416; }
   .tool-btn svg { width:20px; height:20px; flex-shrink:0; }
   .tool-btn.delete-mode.active { border-color:#b5251f; background:#2a1616; }
+  .tool-btn .swatch { width:16px; height:16px; border-radius:3px; flex-shrink:0; }
 
-  #markerList { margin-top:1rem; border-top:1px solid #2a2f3a; padding-top:0.8rem; }
-  #markerList h2 { font-size:0.75rem; letter-spacing:1px; color:#8a8270; margin-bottom:0.5rem; }
-  .marker-row {
+  #drawControls { display:none; gap:0.4rem; margin-bottom:0.6rem; }
+  #drawControls.active { display:flex; }
+  #drawControls button {
+    flex:1; padding:0.45rem; border-radius:0.4rem; border:1px solid #2a2f3a;
+    background:#1a1f2a; color:#e3d6b0; cursor:pointer; font-size:0.72rem;
+  }
+  #drawControls button.finish { border-color:#6a8c6a; color:#a9d0a9; }
+  #drawControls button.cancel { border-color:#b5251f; color:#e0a3a3; }
+  #pointCount { font-size:0.68rem; color:#8a8270; margin-bottom:0.5rem; }
+
+  .list-block h2 { font-size:0.75rem; letter-spacing:1px; color:#8a8270; margin-bottom:0.5rem; }
+  .row {
     display:flex; align-items:center; gap:0.4rem; font-size:0.7rem;
     padding:0.3rem 0.4rem; border-radius:0.3rem; margin-bottom:0.2rem;
     background:#161b24;
   }
-  .marker-row svg { width:14px; height:14px; flex-shrink:0; }
-  .marker-row .country { color:#8a8270; margin-left:auto; }
-  .marker-row button {
-    background:none; border:none; color:#b5251f; cursor:pointer; font-size:0.85rem;
-    padding:0 0.2rem;
-  }
+  .row svg, .row .swatch { width:14px; height:14px; flex-shrink:0; }
+  .row .meta { color:#8a8270; margin-left:auto; text-align:right; }
+  .row button { background:none; border:none; color:#b5251f; cursor:pointer; font-size:0.85rem; padding:0 0.2rem; }
 
   #actions { margin-top:1rem; display:flex; flex-direction:column; gap:0.4rem; }
   #actions button {
     background:#c9b382; border:none; color:#0b0e14; font-weight:600;
     padding:0.6rem; border-radius:0.4rem; cursor:pointer; font-size:0.75rem;
   }
-  #actions button.secondary {
-    background:transparent; border:1px solid #6a5f4a; color:#b8a88a;
-  }
+  #actions button.secondary { background:transparent; border:1px solid #6a5f4a; color:#b8a88a; }
+  #actions .divider { border-top:1px solid #2a2f3a; margin:0.4rem 0; }
 
   #mapArea {
     flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center;
-    padding:1.5rem; background:
+    padding:1.5rem;
+    background:
       linear-gradient(45deg,#151a22 25%,transparent 25%),
       linear-gradient(-45deg,#151a22 25%,transparent 25%),
       linear-gradient(45deg,transparent 75%,#151a22 75%),
@@ -64,34 +72,66 @@
   #svgWrap svg { width:100%; height:auto; display:block; cursor:crosshair; }
 
   #status {
-    position:fixed; bottom:1rem; left:calc(280px + 1.5rem); background:#1a1f2a;
+    position:fixed; bottom:1rem; left:calc(300px + 1.5rem); background:#1a1f2a;
     border:1px solid #2a2f3a; padding:0.5rem 0.9rem; border-radius:0.4rem;
-    font-size:0.75rem; color:#c9b382; display:none;
+    font-size:0.75rem; color:#c9b382; display:none; max-width:500px;
   }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
-  <h1>RESOURCE MAP EDITOR</h1>
-  <p class="hint">Pick a resource, then click anywhere on the map to drop it. Click an existing marker with "delete mode" on to remove it. When you're done, export the JSON and hand it to the viewer page.</p>
+  <h1>MAP EDITOR</h1>
+  <p class="hint">Resources: pick a type, click the map to drop it. Terrain: pick River/Canal/Lake, click to add points, then Finish. Delete mode removes whatever you click, marker or terrain.</p>
 
+  <div class="list-block" style="margin-bottom:0.8rem;">
+    <h2>LOAD EXISTING DATA</h2>
+    <p style="font-size:0.68rem;color:#8a8270;margin-bottom:0.5rem;line-height:1.4;">Already placed resources/terrain in a previous session? Load the JSON files back in to keep editing instead of starting over.</p>
+    <label class="tool-btn" style="justify-content:center;">
+      <i>📂</i> Upload resources.json
+      <input type="file" id="loadResourcesInput" accept="application/json" style="display:none;" />
+    </label>
+    <label class="tool-btn" style="justify-content:center;">
+      <i>📂</i> Upload terrain.json
+      <input type="file" id="loadTerrainInput" accept="application/json" style="display:none;" />
+    </label>
+  </div>
+
+  <h2 class="section-title">Resources</h2>
   <div id="palette"></div>
+
+  <h2 class="section-title">Terrain</h2>
+  <div id="terrainPalette"></div>
+
+  <div id="drawControls">
+    <button class="finish" id="finishDrawBtn">Finish</button>
+    <button class="cancel" id="cancelDrawBtn">Cancel</button>
+  </div>
+  <div id="pointCount"></div>
 
   <div class="tool-btn delete-mode" id="deleteModeBtn">
     <i>🗑️</i> Delete mode
   </div>
 
-  <div id="markerList">
-    <h2>PLACED MARKERS (<span id="markerCount">0</span>)</h2>
+  <div class="list-block">
+    <h2>MARKERS (<span id="markerCount">0</span>)</h2>
     <div id="markerRows"></div>
   </div>
 
+  <div class="list-block" style="margin-top:0.8rem;">
+    <h2>TERRAIN (<span id="terrainCount">0</span>)</h2>
+    <div id="terrainRows"></div>
+  </div>
+
   <div id="actions">
-    <button id="exportBtn">Copy JSON</button>
+    <button id="exportBtn">Copy resources.json</button>
     <button id="downloadBtn" class="secondary">Download resources.json</button>
-    <button id="undoBtn" class="secondary">Undo last</button>
-    <button id="clearBtn" class="secondary">Clear all</button>
+    <div class="divider"></div>
+    <button id="exportTerrainBtn">Copy terrain.json</button>
+    <button id="downloadTerrainBtn" class="secondary">Download terrain.json</button>
+    <div class="divider"></div>
+    <button id="undoBtn" class="secondary">Undo last marker</button>
+    <button id="clearBtn" class="secondary">Clear everything</button>
   </div>
 </div>
 
@@ -105,61 +145,34 @@
 
 <script>
 (function() {
-  // ---- Resource type definitions (icon = inline SVG symbol id, matches viewer) ----
+  // ---- Resource type definitions ----
   const RESOURCE_TYPES = [
-    { key: 'petroleum',   label: 'Petroleum (sea/lakes only)', color: '#111111' },
-    { key: 'coal',        label: 'Coal',                        color: '#1a1a1a' },
-    { key: 'iron',        label: 'Iron & Heavy Metals',         color: '#9a9a9a' },
-    { key: 'copper',      label: 'Copper',                      color: '#b5651d' },
-    { key: 'goldsilver',  label: 'Gold & Silver',                color: '#d4af37' },
-    { key: 'raremetal',   label: 'Rare Metals',                 color: '#9c27b0' },
-    { key: 'radioactive', label: 'Radioactive',                 color: '#ffcc00' },
+    { key: 'petroleum',   label: 'Petroleum (sea/lakes only)' },
+    { key: 'coal',        label: 'Coal' },
+    { key: 'iron',        label: 'Iron & Heavy Metals' },
+    { key: 'copper',      label: 'Copper' },
+    { key: 'goldsilver',  label: 'Gold & Silver' },
+    { key: 'raremetal',   label: 'Rare Metals' },
+    { key: 'radioactive', label: 'Radioactive' },
   ];
 
-  let currentTool = null; // resource key, or null
+  // ---- Terrain type definitions ----
+  const TERRAIN_TYPES = [
+    { key: 'river', label: 'River',  color: '#4a90d9', shape: 'line' },
+    { key: 'canal', label: 'Canal',  color: '#2f6fb0', shape: 'line' },
+    { key: 'lake',  label: 'Lake',   color: '#5b9bd5', shape: 'polygon' },
+  ];
+
+  let currentTool = null;     // resource key, or null
+  let currentTerrain = null;  // terrain key, or null
   let deleteMode = false;
-  let markers = []; // { id, type, x, y, countryId }
+  let markers = [];           // { id, type, x, y, countryId }
+  let terrainFeatures = [];   // { id, type, name, points:[{x,y}], navigable }
+  let activeDraw = null;      // { type, points:[{x,y}] } while drawing terrain
   let markerSeq = 1;
+  let terrainSeq = 1;
   let svgRoot = null;
 
-  // ---- Build the palette buttons ----
-  const palette = document.getElementById('palette');
-  RESOURCE_TYPES.forEach(rt => {
-    const btn = document.createElement('div');
-    btn.className = 'tool-btn';
-    btn.dataset.key = rt.key;
-    btn.innerHTML = `${iconSvgMarkup(rt.key, 20)} <span>${rt.label}</span>`;
-    btn.addEventListener('click', function() {
-      deleteMode = false;
-      document.getElementById('deleteModeBtn').classList.remove('active');
-      currentTool = (currentTool === rt.key) ? null : rt.key;
-      document.querySelectorAll('#palette .tool-btn').forEach(b => b.classList.remove('active'));
-      if (currentTool) btn.classList.add('active');
-      showStatus(currentTool ? ('Click the map to place: ' + rt.label) : '');
-    });
-    palette.appendChild(btn);
-  });
-
-  document.getElementById('deleteModeBtn').addEventListener('click', function() {
-    deleteMode = !deleteMode;
-    this.classList.toggle('active', deleteMode);
-    if (deleteMode) {
-      currentTool = null;
-      document.querySelectorAll('#palette .tool-btn').forEach(b => b.classList.remove('active'));
-      showStatus('Delete mode: click a marker to remove it.');
-    } else {
-      showStatus('');
-    }
-  });
-
-  function showStatus(text) {
-    const s = document.getElementById('status');
-    if (!text) { s.style.display = 'none'; return; }
-    s.style.display = 'block';
-    s.textContent = text;
-  }
-
-  // ---- Small inline SVG icon markup per resource type, reused by viewer too ----
   function iconSvgMarkup(key, size) {
     size = size || 16;
     const paths = {
@@ -175,7 +188,111 @@
     };
     return `<svg width="${size}" height="${size}" viewBox="0 0 16 16">${paths[key] || ''}</svg>`;
   }
-  window.iconSvgMarkup = iconSvgMarkup; // exposed for console/debug parity with viewer
+
+  // ---- Build resource palette ----
+  const palette = document.getElementById('palette');
+  RESOURCE_TYPES.forEach(rt => {
+    const btn = document.createElement('div');
+    btn.className = 'tool-btn';
+    btn.innerHTML = `${iconSvgMarkup(rt.key, 20)} <span>${rt.label}</span>`;
+    btn.addEventListener('click', function() {
+      cancelActiveDraw();
+      deleteMode = false;
+      currentTerrain = null;
+      document.getElementById('deleteModeBtn').classList.remove('active');
+      currentTool = (currentTool === rt.key) ? null : rt.key;
+      document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+      if (currentTool) btn.classList.add('active');
+      showStatus(currentTool ? ('Click the map to place: ' + rt.label) : '');
+    });
+    palette.appendChild(btn);
+  });
+
+  // ---- Build terrain palette ----
+  const terrainPalette = document.getElementById('terrainPalette');
+  TERRAIN_TYPES.forEach(tt => {
+    const btn = document.createElement('div');
+    btn.className = 'tool-btn';
+    btn.innerHTML = `<span class="swatch" style="background:${tt.color}"></span> <span>${tt.label}</span>`;
+    btn.addEventListener('click', function() {
+      deleteMode = false;
+      currentTool = null;
+      document.getElementById('deleteModeBtn').classList.remove('active');
+      document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+
+      if (currentTerrain === tt.key) {
+        cancelActiveDraw();
+        return;
+      }
+      cancelActiveDraw();
+      currentTerrain = tt.key;
+      btn.classList.add('active');
+      activeDraw = { type: tt.key, points: [] };
+      document.getElementById('drawControls').classList.add('active');
+      updatePointCount();
+      const minPts = tt.shape === 'polygon' ? 3 : 2;
+      showStatus(`Drawing ${tt.label}: click to add points (need at least ${minPts}), then Finish.`);
+    });
+    terrainPalette.appendChild(btn);
+  });
+
+  function updatePointCount() {
+    const el = document.getElementById('pointCount');
+    if (!activeDraw) { el.textContent = ''; return; }
+    el.textContent = activeDraw.points.length + ' point(s) placed';
+  }
+
+  function cancelActiveDraw() {
+    activeDraw = null;
+    currentTerrain = null;
+    document.getElementById('drawControls').classList.remove('active');
+    document.querySelectorAll('#terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+    updatePointCount();
+    clearPreview();
+    showStatus('');
+  }
+
+  document.getElementById('cancelDrawBtn').addEventListener('click', cancelActiveDraw);
+
+  document.getElementById('finishDrawBtn').addEventListener('click', function() {
+    if (!activeDraw) return;
+    const tt = TERRAIN_TYPES.find(t => t.key === activeDraw.type);
+    const minPts = tt.shape === 'polygon' ? 3 : 2;
+    if (activeDraw.points.length < minPts) {
+      showStatus(`Need at least ${minPts} points for a ${tt.label.toLowerCase()}.`);
+      return;
+    }
+    const name = prompt('Name this ' + tt.label.toLowerCase() + ':', '');
+    if (name === null) { cancelActiveDraw(); return; } // user hit Cancel on the prompt
+
+    const feature = {
+      id: 't' + (terrainSeq++),
+      type: activeDraw.type,
+      name: name.trim() || (tt.label + ' ' + terrainSeq),
+      points: activeDraw.points.slice(),
+      navigable: true
+    };
+    terrainFeatures.push(feature);
+    drawTerrainFeature(feature);
+    renderTerrainList();
+    cancelActiveDraw();
+  });
+
+  document.getElementById('deleteModeBtn').addEventListener('click', function() {
+    cancelActiveDraw();
+    deleteMode = !deleteMode;
+    this.classList.toggle('active', deleteMode);
+    document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+    currentTool = null;
+    showStatus(deleteMode ? 'Delete mode: click a marker or terrain feature to remove it.' : '');
+  });
+
+  function showStatus(text) {
+    const s = document.getElementById('status');
+    if (!text) { s.style.display = 'none'; return; }
+    s.style.display = 'block';
+    s.textContent = text;
+  }
 
   // ---- Load world.svg ----
   fetch('world.svg').then(r => r.text()).then(svgText => {
@@ -190,7 +307,15 @@
       c.style.strokeWidth = '1.5';
     });
 
-    // Marker layer group sits on top
+    // Layer order (paint order = DOM order): countries -> terrain -> preview -> markers
+    const terrainLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    terrainLayer.setAttribute('id', 'terrainLayer');
+    svgRoot.appendChild(terrainLayer);
+
+    const previewLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    previewLayer.setAttribute('id', 'previewLayer');
+    svgRoot.appendChild(previewLayer);
+
     const markerLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
     markerLayer.setAttribute('id', 'markerLayer');
     svgRoot.appendChild(markerLayer);
@@ -221,9 +346,77 @@
           pt.x = x; pt.y = y;
           if (c.isPointInFill(pt)) return c.id;
         }
-      } catch (e) { /* isPointInFill unsupported — skip auto-detect */ }
+      } catch (e) { /* isPointInFill unsupported */ }
     }
-    return null; // sea / no country under point
+    return null;
+  }
+
+  function pointsToAttr(points) {
+    return points.map(p => p.x + ',' + p.y).join(' ');
+  }
+
+  function clearPreview() {
+    const layer = svgRoot && svgRoot.querySelector('#previewLayer');
+    if (layer) layer.innerHTML = '';
+  }
+
+  function redrawPreview() {
+    clearPreview();
+    if (!activeDraw || activeDraw.points.length === 0) return;
+    const tt = TERRAIN_TYPES.find(t => t.key === activeDraw.type);
+    const layer = svgRoot.querySelector('#previewLayer');
+
+    if (tt.shape === 'polygon') {
+      const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      poly.setAttribute('points', pointsToAttr(activeDraw.points));
+      poly.setAttribute('fill', tt.color);
+      poly.setAttribute('fill-opacity', '0.35');
+      poly.setAttribute('stroke', tt.color);
+      poly.setAttribute('stroke-width', '1.5');
+      poly.setAttribute('stroke-dasharray', '4 3');
+      layer.appendChild(poly);
+    } else {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      line.setAttribute('points', pointsToAttr(activeDraw.points));
+      line.setAttribute('fill', 'none');
+      line.setAttribute('stroke', tt.color);
+      line.setAttribute('stroke-width', '3');
+      line.setAttribute('stroke-linecap', 'round');
+      line.setAttribute('stroke-dasharray', '4 3');
+      layer.appendChild(line);
+    }
+    // dots at each placed point for clarity
+    activeDraw.points.forEach(p => {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', '2.5');
+      dot.setAttribute('fill', tt.color);
+      layer.appendChild(dot);
+    });
+  }
+
+  function drawTerrainFeature(feature) {
+    const tt = TERRAIN_TYPES.find(t => t.key === feature.type);
+    const layer = svgRoot.querySelector('#terrainLayer');
+    let el;
+    if (tt.shape === 'polygon') {
+      el = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      el.setAttribute('fill', tt.color);
+      el.setAttribute('fill-opacity', '0.55');
+      el.setAttribute('stroke', '#2f6fb0');
+      el.setAttribute('stroke-width', '1.5');
+    } else {
+      el = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      el.setAttribute('fill', 'none');
+      el.setAttribute('stroke', tt.color);
+      el.setAttribute('stroke-width', feature.type === 'canal' ? '3' : '4');
+      el.setAttribute('stroke-linecap', 'round');
+      el.setAttribute('stroke-linejoin', 'round');
+      if (feature.type === 'canal') el.setAttribute('stroke-dasharray', '2 3');
+    }
+    el.setAttribute('points', pointsToAttr(feature.points));
+    el.setAttribute('data-terrain-id', feature.id);
+    el.style.cursor = 'pointer';
+    layer.appendChild(el);
   }
 
   function onMapClick(evt) {
@@ -237,12 +430,28 @@
         markers = markers.filter(m => m.id !== id);
         markerEl.remove();
         renderMarkerList();
+        return;
+      }
+      const terrainEl = target.closest('[data-terrain-id]');
+      if (terrainEl) {
+        const id = terrainEl.getAttribute('data-terrain-id');
+        terrainFeatures = terrainFeatures.filter(t => t.id !== id);
+        terrainEl.remove();
+        renderTerrainList();
+        return;
       }
       return;
     }
 
+    if (activeDraw) {
+      activeDraw.points.push({ x: +p.x.toFixed(1), y: +p.y.toFixed(1) });
+      updatePointCount();
+      redrawPreview();
+      return;
+    }
+
     if (!currentTool) {
-      showStatus('Pick a resource type from the left first.');
+      showStatus('Pick a resource or terrain type from the left first.');
       return;
     }
 
@@ -270,15 +479,36 @@
     markers.forEach(m => {
       const rt = RESOURCE_TYPES.find(r => r.key === m.type);
       const row = document.createElement('div');
-      row.className = 'marker-row';
+      row.className = 'row';
       row.innerHTML = `${iconSvgMarkup(m.type, 14)} <span>${rt ? rt.label : m.type}</span>
-        <span class="country">${m.countryId || 'sea'}</span>
+        <span class="meta">${m.countryId || 'sea'}</span>
         <button data-del="${m.id}">✕</button>`;
       row.querySelector('button').addEventListener('click', function() {
         markers = markers.filter(mk => mk.id !== m.id);
         const el = svgRoot.querySelector(`[data-marker-id="${m.id}"]`);
         if (el) el.remove();
         renderMarkerList();
+      });
+      rows.appendChild(row);
+    });
+  }
+
+  function renderTerrainList() {
+    document.getElementById('terrainCount').textContent = terrainFeatures.length;
+    const rows = document.getElementById('terrainRows');
+    rows.innerHTML = '';
+    terrainFeatures.forEach(t => {
+      const tt = TERRAIN_TYPES.find(x => x.key === t.type);
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<span class="swatch" style="background:${tt.color}"></span> <span>${t.name}</span>
+        <span class="meta">${t.points.length} pts</span>
+        <button data-del="${t.id}">✕</button>`;
+      row.querySelector('button').addEventListener('click', function() {
+        terrainFeatures = terrainFeatures.filter(tf => tf.id !== t.id);
+        const el = svgRoot.querySelector(`[data-terrain-id="${t.id}"]`);
+        if (el) el.remove();
+        renderTerrainList();
       });
       rows.appendChild(row);
     });
@@ -294,36 +524,116 @@
   });
 
   document.getElementById('clearBtn').addEventListener('click', function() {
-    if (!confirm('Remove all placed markers?')) return;
+    if (!confirm('Remove ALL markers and terrain features?')) return;
     markers = [];
+    terrainFeatures = [];
     svgRoot.querySelector('#markerLayer').innerHTML = '';
+    svgRoot.querySelector('#terrainLayer').innerHTML = '';
     renderMarkerList();
+    renderTerrainList();
   });
 
-  function exportJson() {
+  function exportResourcesJson() {
     return JSON.stringify(markers.map(m => ({
       type: m.type, x: m.x, y: m.y, countryId: m.countryId
     })), null, 2);
   }
 
-  document.getElementById('exportBtn').addEventListener('click', function() {
-    const json = exportJson();
-    navigator.clipboard.writeText(json).then(() => {
-      showStatus('Copied ' + markers.length + ' markers to clipboard.');
-      setTimeout(() => showStatus(''), 2000);
-    }).catch(() => {
-      alert(json); // fallback: show it so it can be manually copied
-    });
-  });
+  function exportTerrainJson() {
+    return JSON.stringify(terrainFeatures.map(t => ({
+      type: t.type, name: t.name, points: t.points, navigable: t.navigable
+    })), null, 2);
+  }
 
-  document.getElementById('downloadBtn').addEventListener('click', function() {
-    const blob = new Blob([exportJson()], { type: 'application/json' });
+  function copyToClipboard(text, label) {
+    navigator.clipboard.writeText(text).then(() => {
+      showStatus('Copied ' + label + ' to clipboard.');
+      setTimeout(() => showStatus(''), 2000);
+    }).catch(() => alert(text));
+  }
+
+  function downloadJson(text, filename) {
+    const blob = new Blob([text], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'resources.json';
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  document.getElementById('exportBtn').addEventListener('click', () => copyToClipboard(exportResourcesJson(), markers.length + ' resource markers'));
+  document.getElementById('downloadBtn').addEventListener('click', () => downloadJson(exportResourcesJson(), 'resources.json'));
+  document.getElementById('exportTerrainBtn').addEventListener('click', () => copyToClipboard(exportTerrainJson(), terrainFeatures.length + ' terrain features'));
+  document.getElementById('downloadTerrainBtn').addEventListener('click', () => downloadJson(exportTerrainJson(), 'terrain.json'));
+
+  // ---- Load existing resources.json / terrain.json back in ----
+  function readJsonFile(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try { resolve(JSON.parse(reader.result)); }
+        catch (e) { reject(new Error('That file is not valid JSON.')); }
+      };
+      reader.onerror = () => reject(new Error('Could not read the file.'));
+      reader.readAsText(file);
+    });
+  }
+
+  document.getElementById('loadResourcesInput').addEventListener('change', async function() {
+    const file = this.files[0];
+    this.value = ''; // allow re-selecting the same file later
+    if (!file) return;
+    if (!svgRoot) { alert('Wait for the map to finish loading, then try again.'); return; }
+
+    let data;
+    try { data = await readJsonFile(file); }
+    catch (e) { alert(e.message); return; }
+
+    if (!Array.isArray(data)) { alert('Expected resources.json to be a JSON array.'); return; }
+
+    let loaded = 0;
+    data.forEach(item => {
+      if (!item || !item.type || typeof item.x !== 'number' || typeof item.y !== 'number') return;
+      const marker = { id: 'm' + (markerSeq++), type: item.type, x: item.x, y: item.y, countryId: item.countryId || null };
+      markers.push(marker);
+      drawMarker(marker);
+      loaded++;
+    });
+    renderMarkerList();
+    showStatus('Loaded ' + loaded + ' resource marker(s) from ' + file.name + '.');
+    setTimeout(() => showStatus(''), 2500);
+  });
+
+  document.getElementById('loadTerrainInput').addEventListener('change', async function() {
+    const file = this.files[0];
+    this.value = '';
+    if (!file) return;
+    if (!svgRoot) { alert('Wait for the map to finish loading, then try again.'); return; }
+
+    let data;
+    try { data = await readJsonFile(file); }
+    catch (e) { alert(e.message); return; }
+
+    if (!Array.isArray(data)) { alert('Expected terrain.json to be a JSON array.'); return; }
+
+    let loaded = 0;
+    data.forEach(item => {
+      if (!item || !item.type || !Array.isArray(item.points) || item.points.length < 2) return;
+      const feature = {
+        id: 't' + (terrainSeq++),
+        type: item.type,
+        name: item.name || (item.type + ' ' + terrainSeq),
+        points: item.points,
+        navigable: item.navigable !== false
+      };
+      terrainFeatures.push(feature);
+      drawTerrainFeature(feature);
+      loaded++;
+    });
+    renderTerrainList();
+    showStatus('Loaded ' + loaded + ' terrain feature(s) from ' + file.name + '.');
+    setTimeout(() => showStatus(''), 2500);
   });
 })();
 </script>
