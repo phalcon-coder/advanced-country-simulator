@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>SOVEREIGN · Dashboard</title>
 
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="images/favicon.png" />
+<link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -30,17 +34,20 @@
       <button id="hamburgerBtn" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
       </button>
-      <div class="brand"><i class="fas fa-crown"></i> SOVEREIGN</div>
+      <div class="brand">
+        <img src="images/logo.png" alt="SOVEREIGN" style="height:32px; width:auto; display:block;" />
+        <span>SOVEREIGN</span>
+      </div>
     </div>
     <div id="topIcons">
       <button class="top-icon-btn" id="iconAccount" title="Account details"><i class="fas fa-user"></i></button>
       <button class="top-icon-btn" id="iconCountry" title="Country details"><i class="fas fa-flag"></i></button>
       <button class="top-icon-btn" id="iconWiki" title="World Wiki"><i class="fas fa-book"></i></button>
-      <button class="top-icon-btn" id="iconCompanies" title="Companies & Contracts"><i class="fas fa-building-columns"></i></button>
+      <button class="top-icon-btn" id="iconCompanies" title="Companies & Contracts"><i class="fas fa-building"></i></button>
       <button class="top-icon-btn" id="iconMap" title="World Map"><i class="fas fa-globe"></i></button>
       <button class="top-icon-btn" id="iconNotifications" title="Notifications"><i class="fas fa-bell"></i><span class="dot"></span></button>
       <button class="top-icon-btn" id="iconChat" title="Chat"><i class="fas fa-comments"></i><span class="dot"></span></button>
-      <button class="top-icon-btn" id="iconBank" title="Bank"><i class="fas fa-sack-dollar"></i></button>
+      <button class="top-icon-btn" id="iconBank" title="Bank"><i class="fas fa-university"></i></button>
     </div>
   </div>
 
@@ -59,7 +66,7 @@
         <li data-module="industries"><button><i class="fas fa-industry"></i> Industries</button></li>
         <li data-module="power"><button><i class="fas fa-bolt"></i> Power</button></li>
         <li data-module="transport"><button><i class="fas fa-train"></i> Transport</button></li>
-        <li data-module="defence"><button><i class="fas fa-shield-halved"></i> Defence</button></li>
+        <li data-module="defence"><button><i class="fas fa-shield-alt"></i> Defence</button></li>
         <li data-module="network"><button><i class="fas fa-tower-broadcast"></i> Network</button></li>
         <li data-module="administration"><button><i class="fas fa-gavel"></i> Administration</button></li>
         <li data-module="economy-trade"><button><i class="fas fa-coins"></i> Economy & Trade</button></li>
@@ -162,7 +169,6 @@
 <script src="js/router.js"></script>
 <script src="js/app.js"></script>
 <script src="js/auth.js"></script>
-
 
 <script>
 // ============================================================
