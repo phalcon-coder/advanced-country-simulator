@@ -17,6 +17,114 @@
 <link rel="stylesheet" href="css/style.css" />
 <link rel="stylesheet" href="css/components.css" />
 <link rel="stylesheet" href="css/gamestyle.css" />
+
+<style>
+/* Additional styles for world map modal */
+.modal-box.large {
+  max-width: 800px;
+  width: 95%;
+}
+
+.modal-box .map-selector {
+  margin-bottom: 1rem;
+}
+
+.modal-box .map-selector label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+
+.modal-box .map-selector select {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9b382' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.modal-box .map-selector select:hover {
+  border-color: var(--gold);
+}
+
+.modal-box .map-selector select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201, 179, 130, 0.2);
+}
+
+.modal-box .map-selector select option {
+  background: var(--bg-panel);
+  color: var(--text);
+}
+
+.modal-box .map-container {
+  width: 100%;
+  height: 500px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-inset);
+  position: relative;
+}
+
+.modal-box .map-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.modal-box .map-container .map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  font-size: 0.9rem;
+  gap: 0.8rem;
+  background: var(--bg-inset);
+}
+
+.modal-box .map-container .map-loading i {
+  font-size: 1.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .modal-box.large {
+    max-width: 100%;
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  
+  .modal-box .map-container {
+    height: 60vh;
+  }
+}
+</style>
 </head>
 <body class="game-body">
 
@@ -162,6 +270,34 @@
   </div>
 </div>
 
+<!-- World Map Modal (icon 5) -->
+<div class="modal-overlay" id="worldMapModal">
+  <div class="modal-box large">
+    <h2>
+      <span><i class="fas fa-globe" style="color:var(--gold);margin-right:0.5rem;"></i>World Map</span>
+      <button class="modal-close">&times;</button>
+    </h2>
+    
+    <div class="map-selector">
+      <label for="mapTypeSelect">Map Type</label>
+      <select id="mapTypeSelect">
+        <option value="political">Political</option>
+        <option value="natural">Natural</option>
+        <option value="infrastructural">Infrastructural</option>
+        <option value="defence">Defence</option>
+      </select>
+    </div>
+    
+    <div class="map-container" id="mapContainer">
+      <div class="map-loading" id="mapLoading">
+        <i class="fas fa-spinner"></i>
+        <span>Loading map...</span>
+      </div>
+      <iframe id="mapIframe" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
 <!-- Supabase client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
@@ -227,6 +363,104 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
+});
+
+// ============================================================
+// World Map Modal
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const worldMapBtn = document.getElementById('iconMap');
+  const worldMapModal = document.getElementById('worldMapModal');
+  const mapTypeSelect = document.getElementById('mapTypeSelect');
+  const mapIframe = document.getElementById('mapIframe');
+  const mapLoading = document.getElementById('mapLoading');
+  const closeBtn = worldMapModal.querySelector('.modal-close');
+  
+  // Map file paths
+  const mapFiles = {
+    political: 'maps/w_political.html',
+    natural: 'maps/w_natural.html',
+    infrastructural: 'maps/w_infrastructural.html',
+    defence: 'maps/w_defence.html'
+  };
+  
+  // Function to load map
+  function loadMap(type) {
+    const mapPath = mapFiles[type] || mapFiles.political;
+    
+    // Show loading
+    mapLoading.style.display = 'flex';
+    mapIframe.style.display = 'none';
+    
+    // Load the iframe
+    mapIframe.src = mapPath;
+    
+    // Hide loading when iframe loads
+    mapIframe.onload = function() {
+      mapLoading.style.display = 'none';
+      mapIframe.style.display = 'block';
+    };
+    
+    // Fallback: hide loading after 5 seconds even if iframe doesn't fire onload
+    setTimeout(function() {
+      if (mapLoading.style.display !== 'none') {
+        mapLoading.style.display = 'none';
+        mapIframe.style.display = 'block';
+      }
+    }, 5000);
+  }
+  
+  // Open modal
+  function openWorldMap() {
+    worldMapModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Load default map (political)
+    const defaultType = mapTypeSelect.value || 'political';
+    loadMap(defaultType);
+  }
+  
+  // Close modal
+  function closeWorldMap() {
+    worldMapModal.classList.remove('active');
+    document.body.style.overflow = '';
+    // Clear iframe to stop any ongoing loading
+    setTimeout(() => {
+      mapIframe.src = '';
+      mapLoading.style.display = 'flex';
+      mapIframe.style.display = 'none';
+    }, 300);
+  }
+  
+  // Event listeners
+  if (worldMapBtn) {
+    worldMapBtn.addEventListener('click', openWorldMap);
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeWorldMap);
+  }
+  
+  // Close modal on overlay click
+  worldMapModal.addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeWorldMap();
+    }
+  });
+  
+  // Close modal on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && worldMapModal.classList.contains('active')) {
+      closeWorldMap();
+    }
+  });
+  
+  // Map type change
+  if (mapTypeSelect) {
+    mapTypeSelect.addEventListener('change', function() {
+      loadMap(this.value);
+    });
+  }
 });
 </script>
 </body>
