@@ -95,6 +95,10 @@
       <i>📂</i> Upload terrain.json
       <input type="file" id="loadTerrainInput" accept="application/json" style="display:none;" />
     </label>
+    <label class="tool-btn" style="justify-content:center;">
+      <i>📂</i> Upload elevation.json
+      <input type="file" id="loadElevationInput" accept="application/json" style="display:none;" />
+    </label>
   </div>
 
   <h2 class="section-title">Resources</h2>
@@ -102,6 +106,10 @@
 
   <h2 class="section-title">Terrain</h2>
   <div id="terrainPalette"></div>
+
+  <h2 class="section-title">Elevation</h2>
+  <div id="elevationPalette"></div>
+  <p style="font-size:0.65rem;color:#8a8270;margin:-0.2rem 0 0.5rem;line-height:1.3;">Draw a region same as a lake (click points, Finish). You'll be asked for a name and an average altitude in meters.</p>
 
   <div id="drawControls">
     <button class="finish" id="finishDrawBtn">Finish</button>
@@ -123,12 +131,20 @@
     <div id="terrainRows"></div>
   </div>
 
+  <div class="list-block" style="margin-top:0.8rem;">
+    <h2>ELEVATION (<span id="elevationCount">0</span>)</h2>
+    <div id="elevationRows"></div>
+  </div>
+
   <div id="actions">
     <button id="exportBtn">Copy resources.json</button>
     <button id="downloadBtn" class="secondary">Download resources.json</button>
     <div class="divider"></div>
     <button id="exportTerrainBtn">Copy terrain.json</button>
     <button id="downloadTerrainBtn" class="secondary">Download terrain.json</button>
+    <div class="divider"></div>
+    <button id="exportElevationBtn">Copy elevation.json</button>
+    <button id="downloadElevationBtn" class="secondary">Download elevation.json</button>
     <div class="divider"></div>
     <button id="undoBtn" class="secondary">Undo last marker</button>
     <button id="clearBtn" class="secondary">Clear everything</button>
@@ -163,14 +179,29 @@
     { key: 'lake',  label: 'Lake',   color: '#5b9bd5', shape: 'polygon' },
   ];
 
+  // ---- Elevation type definitions (regions, always polygons) ----
+  const ELEVATION_TYPES = [
+    { key: 'hill',     label: 'Hills',     color: '#9caf3f', shape: 'polygon' },
+    { key: 'mountain', label: 'Mountains', color: '#8b7355', shape: 'polygon' },
+    { key: 'plateau',  label: 'Plateau',   color: '#c2a76b', shape: 'polygon' },
+  ];
+
+  function findTypeDef(category, key) {
+    const list = category === 'elevation' ? ELEVATION_TYPES : TERRAIN_TYPES;
+    return list.find(t => t.key === key);
+  }
+
   let currentTool = null;     // resource key, or null
   let currentTerrain = null;  // terrain key, or null
+  let currentElevation = null; // elevation key, or null
   let deleteMode = false;
   let markers = [];           // { id, type, x, y, countryId }
   let terrainFeatures = [];   // { id, type, name, points:[{x,y}], navigable }
-  let activeDraw = null;      // { type, points:[{x,y}] } while drawing terrain
+  let elevationFeatures = []; // { id, type, name, altitude, points:[{x,y}] }
+  let activeDraw = null;      // { category:'terrain'|'elevation', type, points:[{x,y}] } while drawing
   let markerSeq = 1;
   let terrainSeq = 1;
+  let elevationSeq = 1;
   let svgRoot = null;
 
   function iconSvgMarkup(key, size) {
@@ -199,14 +230,19 @@
       cancelActiveDraw();
       deleteMode = false;
       currentTerrain = null;
+      currentElevation = null;
       document.getElementById('deleteModeBtn').classList.remove('active');
       currentTool = (currentTool === rt.key) ? null : rt.key;
-      document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+      deactivateAllPaletteButtons();
       if (currentTool) btn.classList.add('active');
       showStatus(currentTool ? ('Click the map to place: ' + rt.label) : '');
     });
     palette.appendChild(btn);
   });
+
+  function deactivateAllPaletteButtons() {
+    document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn, #elevationPalette .tool-btn').forEach(b => b.classList.remove('active'));
+  }
 
   // ---- Build terrain palette ----
   const terrainPalette = document.getElementById('terrainPalette');
@@ -218,7 +254,7 @@
       deleteMode = false;
       currentTool = null;
       document.getElementById('deleteModeBtn').classList.remove('active');
-      document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+      deactivateAllPaletteButtons();
 
       if (currentTerrain === tt.key) {
         cancelActiveDraw();
@@ -227,13 +263,40 @@
       cancelActiveDraw();
       currentTerrain = tt.key;
       btn.classList.add('active');
-      activeDraw = { type: tt.key, points: [] };
+      activeDraw = { category: 'terrain', type: tt.key, points: [] };
       document.getElementById('drawControls').classList.add('active');
       updatePointCount();
       const minPts = tt.shape === 'polygon' ? 3 : 2;
       showStatus(`Drawing ${tt.label}: click to add points (need at least ${minPts}), then Finish.`);
     });
     terrainPalette.appendChild(btn);
+  });
+
+  // ---- Build elevation palette ----
+  const elevationPalette = document.getElementById('elevationPalette');
+  ELEVATION_TYPES.forEach(et => {
+    const btn = document.createElement('div');
+    btn.className = 'tool-btn';
+    btn.innerHTML = `<span class="swatch" style="background:${et.color}"></span> <span>${et.label}</span>`;
+    btn.addEventListener('click', function() {
+      deleteMode = false;
+      currentTool = null;
+      document.getElementById('deleteModeBtn').classList.remove('active');
+      deactivateAllPaletteButtons();
+
+      if (currentElevation === et.key) {
+        cancelActiveDraw();
+        return;
+      }
+      cancelActiveDraw();
+      currentElevation = et.key;
+      btn.classList.add('active');
+      activeDraw = { category: 'elevation', type: et.key, points: [] };
+      document.getElementById('drawControls').classList.add('active');
+      updatePointCount();
+      showStatus(`Drawing ${et.label}: click to add points (need at least 3), then Finish.`);
+    });
+    elevationPalette.appendChild(btn);
   });
 
   function updatePointCount() {
@@ -245,8 +308,9 @@
   function cancelActiveDraw() {
     activeDraw = null;
     currentTerrain = null;
+    currentElevation = null;
     document.getElementById('drawControls').classList.remove('active');
-    document.querySelectorAll('#terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+    deactivateAllPaletteButtons();
     updatePointCount();
     clearPreview();
     showStatus('');
@@ -256,19 +320,38 @@
 
   document.getElementById('finishDrawBtn').addEventListener('click', function() {
     if (!activeDraw) return;
-    const tt = TERRAIN_TYPES.find(t => t.key === activeDraw.type);
-    const minPts = tt.shape === 'polygon' ? 3 : 2;
+    const def = findTypeDef(activeDraw.category, activeDraw.type);
+    const minPts = def.shape === 'polygon' ? 3 : 2;
     if (activeDraw.points.length < minPts) {
-      showStatus(`Need at least ${minPts} points for a ${tt.label.toLowerCase()}.`);
+      showStatus(`Need at least ${minPts} points for a ${def.label.toLowerCase()}.`);
       return;
     }
-    const name = prompt('Name this ' + tt.label.toLowerCase() + ':', '');
+    const name = prompt('Name this ' + def.label.toLowerCase() + ':', '');
     if (name === null) { cancelActiveDraw(); return; } // user hit Cancel on the prompt
+
+    if (activeDraw.category === 'elevation') {
+      let altitude = prompt('Average altitude in meters for "' + (name.trim() || def.label) + '" (optional):', '');
+      altitude = altitude && altitude.trim() !== '' ? Number(altitude) : null;
+      if (altitude !== null && isNaN(altitude)) altitude = null;
+
+      const feature = {
+        id: 'e' + (elevationSeq++),
+        type: activeDraw.type,
+        name: name.trim() || (def.label + ' ' + elevationSeq),
+        altitude: altitude,
+        points: activeDraw.points.slice()
+      };
+      elevationFeatures.push(feature);
+      drawElevationFeature(feature);
+      renderElevationList();
+      cancelActiveDraw();
+      return;
+    }
 
     const feature = {
       id: 't' + (terrainSeq++),
       type: activeDraw.type,
-      name: name.trim() || (tt.label + ' ' + terrainSeq),
+      name: name.trim() || (def.label + ' ' + terrainSeq),
       points: activeDraw.points.slice(),
       navigable: true
     };
@@ -282,9 +365,9 @@
     cancelActiveDraw();
     deleteMode = !deleteMode;
     this.classList.toggle('active', deleteMode);
-    document.querySelectorAll('#palette .tool-btn, #terrainPalette .tool-btn').forEach(b => b.classList.remove('active'));
+    deactivateAllPaletteButtons();
     currentTool = null;
-    showStatus(deleteMode ? 'Delete mode: click a marker or terrain feature to remove it.' : '');
+    showStatus(deleteMode ? 'Delete mode: click a marker, terrain, or elevation feature to remove it.' : '');
   });
 
   function showStatus(text) {
@@ -307,7 +390,11 @@
       c.style.strokeWidth = '1.5';
     });
 
-    // Layer order (paint order = DOM order): countries -> terrain -> preview -> markers
+    // Layer order (paint order = DOM order): countries -> elevation -> terrain -> preview -> markers
+    const elevationLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
+    elevationLayer.setAttribute('id', 'elevationLayer');
+    svgRoot.appendChild(elevationLayer);
+
     const terrainLayer = doc.createElementNS('http://www.w3.org/2000/svg', 'g');
     terrainLayer.setAttribute('id', 'terrainLayer');
     svgRoot.appendChild(terrainLayer);
@@ -363,7 +450,7 @@
   function redrawPreview() {
     clearPreview();
     if (!activeDraw || activeDraw.points.length === 0) return;
-    const tt = TERRAIN_TYPES.find(t => t.key === activeDraw.type);
+    const tt = findTypeDef(activeDraw.category, activeDraw.type);
     const layer = svgRoot.querySelector('#previewLayer');
 
     if (tt.shape === 'polygon') {
@@ -419,6 +506,21 @@
     layer.appendChild(el);
   }
 
+  function drawElevationFeature(feature) {
+    const et = ELEVATION_TYPES.find(t => t.key === feature.type);
+    const layer = svgRoot.querySelector('#elevationLayer');
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    el.setAttribute('points', pointsToAttr(feature.points));
+    el.setAttribute('fill', et.color);
+    el.setAttribute('fill-opacity', '0.5');
+    el.setAttribute('stroke', et.color);
+    el.setAttribute('stroke-width', '1.2');
+    el.setAttribute('data-elevation-id', feature.id);
+    el.style.cursor = 'pointer';
+    layer.appendChild(el);
+  }
+
+
   function onMapClick(evt) {
     const target = evt.target;
     const p = svgPoint(evt);
@@ -438,6 +540,14 @@
         terrainFeatures = terrainFeatures.filter(t => t.id !== id);
         terrainEl.remove();
         renderTerrainList();
+        return;
+      }
+      const elevationEl = target.closest('[data-elevation-id]');
+      if (elevationEl) {
+        const id = elevationEl.getAttribute('data-elevation-id');
+        elevationFeatures = elevationFeatures.filter(t => t.id !== id);
+        elevationEl.remove();
+        renderElevationList();
         return;
       }
       return;
@@ -514,6 +624,27 @@
     });
   }
 
+  function renderElevationList() {
+    document.getElementById('elevationCount').textContent = elevationFeatures.length;
+    const rows = document.getElementById('elevationRows');
+    rows.innerHTML = '';
+    elevationFeatures.forEach(e => {
+      const et = ELEVATION_TYPES.find(x => x.key === e.type);
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `<span class="swatch" style="background:${et.color}"></span> <span>${e.name}</span>
+        <span class="meta">${e.altitude != null ? e.altitude + 'm' : et.label}</span>
+        <button data-del="${e.id}">✕</button>`;
+      row.querySelector('button').addEventListener('click', function() {
+        elevationFeatures = elevationFeatures.filter(ef => ef.id !== e.id);
+        const el = svgRoot.querySelector(`[data-elevation-id="${e.id}"]`);
+        if (el) el.remove();
+        renderElevationList();
+      });
+      rows.appendChild(row);
+    });
+  }
+
   document.getElementById('undoBtn').addEventListener('click', function() {
     const last = markers.pop();
     if (last) {
@@ -524,13 +655,16 @@
   });
 
   document.getElementById('clearBtn').addEventListener('click', function() {
-    if (!confirm('Remove ALL markers and terrain features?')) return;
+    if (!confirm('Remove ALL markers, terrain, and elevation features?')) return;
     markers = [];
     terrainFeatures = [];
+    elevationFeatures = [];
     svgRoot.querySelector('#markerLayer').innerHTML = '';
     svgRoot.querySelector('#terrainLayer').innerHTML = '';
+    svgRoot.querySelector('#elevationLayer').innerHTML = '';
     renderMarkerList();
     renderTerrainList();
+    renderElevationList();
   });
 
   function exportResourcesJson() {
@@ -542,6 +676,12 @@
   function exportTerrainJson() {
     return JSON.stringify(terrainFeatures.map(t => ({
       type: t.type, name: t.name, points: t.points, navigable: t.navigable
+    })), null, 2);
+  }
+
+  function exportElevationJson() {
+    return JSON.stringify(elevationFeatures.map(e => ({
+      type: e.type, name: e.name, altitude: e.altitude, points: e.points
     })), null, 2);
   }
 
@@ -566,8 +706,10 @@
   document.getElementById('downloadBtn').addEventListener('click', () => downloadJson(exportResourcesJson(), 'resources.json'));
   document.getElementById('exportTerrainBtn').addEventListener('click', () => copyToClipboard(exportTerrainJson(), terrainFeatures.length + ' terrain features'));
   document.getElementById('downloadTerrainBtn').addEventListener('click', () => downloadJson(exportTerrainJson(), 'terrain.json'));
+  document.getElementById('exportElevationBtn').addEventListener('click', () => copyToClipboard(exportElevationJson(), elevationFeatures.length + ' elevation features'));
+  document.getElementById('downloadElevationBtn').addEventListener('click', () => downloadJson(exportElevationJson(), 'elevation.json'));
 
-  // ---- Load existing resources.json / terrain.json back in ----
+  // ---- Load existing resources.json / terrain.json / elevation.json back in ----
   function readJsonFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -633,6 +775,37 @@
     });
     renderTerrainList();
     showStatus('Loaded ' + loaded + ' terrain feature(s) from ' + file.name + '.');
+    setTimeout(() => showStatus(''), 2500);
+  });
+
+  document.getElementById('loadElevationInput').addEventListener('change', async function() {
+    const file = this.files[0];
+    this.value = '';
+    if (!file) return;
+    if (!svgRoot) { alert('Wait for the map to finish loading, then try again.'); return; }
+
+    let data;
+    try { data = await readJsonFile(file); }
+    catch (e) { alert(e.message); return; }
+
+    if (!Array.isArray(data)) { alert('Expected elevation.json to be a JSON array.'); return; }
+
+    let loaded = 0;
+    data.forEach(item => {
+      if (!item || !item.type || !Array.isArray(item.points) || item.points.length < 3) return;
+      const feature = {
+        id: 'e' + (elevationSeq++),
+        type: item.type,
+        name: item.name || (item.type + ' ' + elevationSeq),
+        altitude: typeof item.altitude === 'number' ? item.altitude : null,
+        points: item.points
+      };
+      elevationFeatures.push(feature);
+      drawElevationFeature(feature);
+      loaded++;
+    });
+    renderElevationList();
+    showStatus('Loaded ' + loaded + ' elevation feature(s) from ' + file.name + '.');
     setTimeout(() => showStatus(''), 2500);
   });
 })();
