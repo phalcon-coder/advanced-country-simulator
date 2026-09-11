@@ -57,6 +57,7 @@
 
 <div id="legend"></div>
 
+<!-- Supabase client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
 
@@ -163,7 +164,18 @@
       .eq('id', countryId)
       .maybeSingle();
 
-    if (error || !data || !data.owner_id) {
+    if (error) {
+      console.error('Could not load country data:', error.message);
+      panelBody.innerHTML = `
+        <div class="country-name">${countryId}</div>
+        <span class="unclaimed-badge" style="background:rgba(181,90,90,0.15);color:#e0a3a3;border-color:rgba(181,90,90,0.4);">
+          Could not load data — check console / Supabase keys
+        </span>
+      `;
+      return;
+    }
+
+    if (!data || !data.owner_id) {
       panelBody.innerHTML = `
         <div class="country-name">${countryId}</div>
         <span class="unclaimed-badge">Unclaimed territory</span>
@@ -282,4 +294,3 @@
 </script>
 </body>
 </html>
-
