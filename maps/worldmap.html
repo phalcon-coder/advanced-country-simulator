@@ -59,7 +59,7 @@
 
 <!-- Supabase client -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
+<script src="../js/supabase.js"></script>
 
 <script>
 (function() {
@@ -158,37 +158,51 @@
 
   async function showCountryInfo(countryId) {
     panelBody.innerHTML = '<span class="placeholder">Loading...</span>';
-    const { data, error } = await supabase
-      .from('countries')
-      .select('id,name,owner_id,flag_url,currency_name,currency_symbol')
-      .eq('id', countryId)
-      .maybeSingle();
+    try {
+      if (typeof supabase === 'undefined') {
+        throw new Error('supabase client is not defined — js/supabase.js failed to load (check its <script src> path and the browser console/network tab)');
+      }
 
-    if (error) {
-      console.error('Could not load country data:', error.message);
+      const { data, error } = await supabase
+        .from('countries')
+        .select('id,name,owner_id,flag_url,currency_name,currency_symbol')
+        .eq('id', countryId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Could not load country data:', error.message);
+        panelBody.innerHTML = `
+          <div class="country-name">${countryId}</div>
+          <span class="unclaimed-badge" style="background:rgba(181,90,90,0.15);color:#e0a3a3;border-color:rgba(181,90,90,0.4);">
+            Could not load data — check console / Supabase keys
+          </span>
+        `;
+        return;
+      }
+
+      if (!data || !data.owner_id) {
+        panelBody.innerHTML = `
+          <div class="country-name">${countryId}</div>
+          <span class="unclaimed-badge">Unclaimed territory</span>
+        `;
+        return;
+      }
+
+      panelBody.innerHTML = `
+        ${data.flag_url ? `<img class="flag-img" src="${data.flag_url}" alt="${data.name} flag" />` : ''}
+        <div class="country-name">${data.name || countryId}</div>
+        <div class="country-meta">${countryId}</div>
+        ${data.currency_name ? `<div class="country-meta">Currency: ${data.currency_symbol || ''} ${data.currency_name}</div>` : ''}
+      `;
+    } catch (err) {
+      console.error('showCountryInfo failed:', err);
       panelBody.innerHTML = `
         <div class="country-name">${countryId}</div>
         <span class="unclaimed-badge" style="background:rgba(181,90,90,0.15);color:#e0a3a3;border-color:rgba(181,90,90,0.4);">
-          Could not load data — check console / Supabase keys
+          Something went wrong loading this country — check console
         </span>
       `;
-      return;
     }
-
-    if (!data || !data.owner_id) {
-      panelBody.innerHTML = `
-        <div class="country-name">${countryId}</div>
-        <span class="unclaimed-badge">Unclaimed territory</span>
-      `;
-      return;
-    }
-
-    panelBody.innerHTML = `
-      ${data.flag_url ? `<img class="flag-img" src="${data.flag_url}" alt="${data.name} flag" />` : ''}
-      <div class="country-name">${data.name || countryId}</div>
-      <div class="country-meta">${countryId}</div>
-      ${data.currency_name ? `<div class="country-meta">Currency: ${data.currency_symbol || ''} ${data.currency_name}</div>` : ''}
-    `;
   }
 
   // ---- Load map + resource markers + terrain + elevation ----
