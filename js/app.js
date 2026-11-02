@@ -45,11 +45,15 @@ function registerAllModules() {
     label: 'Map',
     icon: 'fa-map',
     render(container) {
-      container.innerHTML = `<iframe src="../worldmap.html" style="width:100%;height:100%;min-height:70vh;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;"></iframe>`;
+      container.innerHTML = `<iframe src="maps/worldmap.html" style="width:100%;height:100%;min-height:70vh;border:1px solid var(--border);border-radius:var(--radius-md);background:#fff;"></iframe>`;
     }
   });
 
-  registerModule('provinces-cities', { label: 'Provinces & Cities', icon: 'fa-city' });
+  registerModule('provinces-cities', {
+    label: 'Provinces & Cities',
+    icon: 'fa-city',
+    render(container) { ProvincesCitiesModule.render(container); }
+  });
   registerModule('industries',       { label: 'Industries',         icon: 'fa-industry' });
   registerModule('power',            { label: 'Power',               icon: 'fa-bolt' });
   registerModule('transport',        { label: 'Transport',           icon: 'fa-train' });
