@@ -1,0 +1,80 @@
+/* ============================================================
+   provinces-cities.css — country map viewer (countrymap.js) and
+   the Provinces & Cities module UI.
+   ============================================================ */
+
+.countrymap-wrap { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.countrymap-toggle-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.countrymap-toggle-btn {
+  background: var(--bg-inset); color: var(--text-dim); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 0.3rem 0.7rem; font-size: 0.8rem; cursor: pointer;
+}
+.countrymap-toggle-btn.active { color: var(--gold-bright); border-color: var(--border-strong); background: var(--bg-panel-raise); }
+
+.countrymap-svg {
+  width: 100%; max-height: 46vh; background: var(--bg-inset);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+}
+.country-outline { fill: #f4f1e8; stroke: var(--text-faint); stroke-width: 2; }
+
+.province-shape { transition: fill 0.15s ease; }
+.province-shape:hover { fill: rgba(212,175,55,0.28) !important; }
+.province-shape.editing { stroke-width: 3; stroke-dasharray: 4 3; }
+.province-label { fill: var(--text-dim); font-size: 10px; pointer-events: none; }
+
+.province-draw-preview { fill: none; stroke: var(--gold-bright); stroke-width: 2; stroke-dasharray: 5 4; }
+.province-draw-vertex { fill: var(--gold-bright); }
+
+.city-dot { fill: var(--text-dim); stroke: var(--bg-void); stroke-width: 1; }
+.city-dot.capital { fill: var(--gold-bright); }
+.city-marker.deserted .city-dot { fill: var(--text-faint); opacity: 0.6; }
+.city-label { fill: var(--text); font-size: 9px; pointer-events: none; }
+.city-marker.deserted .city-label { fill: var(--text-faint); font-style: italic; }
+
+.pc-module { display: flex; flex-direction: column; gap: 0.8rem; }
+.pc-tabs { display: flex; gap: 0.4rem; border-bottom: 1px solid var(--border); }
+.pc-tab {
+  background: none; border: none; color: var(--text-dim); padding: 0.5rem 1rem;
+  font-family: var(--font-display); cursor: pointer; border-bottom: 2px solid transparent;
+}
+.pc-tab.active { color: var(--gold-bright); border-bottom-color: var(--gold); }
+
+.pc-map-mount { min-height: 120px; }
+
+.pc-toolbar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.pc-hint { color: var(--text-dim); font-size: 0.85rem; font-style: italic; }
+
+.pc-list-header { display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem; }
+.pc-sort select { background: var(--bg-inset); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.2rem 0.4rem; }
+
+.pc-province-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.pc-province-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.6rem 0.8rem; }
+.pc-province-card.is-capital { border-color: var(--border-strong); background: var(--bg-panel-raise); }
+.pc-province-card-head { display: flex; justify-content: space-between; align-items: center; }
+.pc-province-actions { display: flex; gap: 0.3rem; }
+.pc-province-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.4rem 0.8rem; margin-top: 0.5rem; font-size: 0.85rem; }
+.pc-field-label { color: var(--text-faint); margin-right: 0.3rem; }
+.pc-province-details select { background: var(--bg-inset); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.15rem 0.3rem; }
+
+.icon-btn { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 0.2rem 0.4rem; }
+.icon-btn:hover { color: var(--gold-bright); }
+.icon-btn.danger:hover { color: var(--danger-bright); }
+
+.pc-city-list { display: flex; flex-direction: column; gap: 0.3rem; }
+.pc-city-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 0.4rem 0.7rem; cursor: pointer;
+}
+.pc-city-row.selected { border-color: var(--gold); }
+.pc-city-row.deserted { opacity: 0.65; }
+.btn-link { background: none; border: none; color: var(--text-dim); cursor: pointer; text-decoration: underline; font-size: 0.8rem; }
+.btn-link.danger { color: var(--danger-bright); }
+
+.pc-city-detail { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.8rem; }
+.pc-city-stats { display: flex; gap: 1.2rem; margin: 0.4rem 0 0.8rem; font-size: 0.85rem; color: var(--text-dim); }
+.pc-city-links, .pc-infra-toolbar { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.6rem; }
+.btn-sm.active { color: var(--gold-bright); border-color: var(--gold); }
+
+.empty-state.small { padding: 1rem; text-align: center; color: var(--text-faint); font-size: 0.85rem; }
