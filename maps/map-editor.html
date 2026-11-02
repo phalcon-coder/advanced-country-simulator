@@ -339,12 +339,14 @@
         if (altitude !== null && isNaN(altitude)) altitude = null;
       }
 
+      const centroid = activeDraw.points.reduce((a, p) => ({ x: a.x + p.x / activeDraw.points.length, y: a.y + p.y / activeDraw.points.length }), { x: 0, y: 0 });
       const feature = {
         id: 'e' + (elevationSeq++),
         type: activeDraw.type,
         name: name.trim() || (def.label + ' ' + elevationSeq),
         altitude: altitude,
-        points: activeDraw.points.slice()
+        points: activeDraw.points.slice(),
+        countryId: findCountryAt(centroid.x, centroid.y)
       };
       elevationFeatures.push(feature);
       drawElevationFeature(feature);
@@ -353,12 +355,14 @@
       return;
     }
 
+    const terrainCentroid = activeDraw.points.reduce((a, p) => ({ x: a.x + p.x / activeDraw.points.length, y: a.y + p.y / activeDraw.points.length }), { x: 0, y: 0 });
     const feature = {
       id: 't' + (terrainSeq++),
       type: activeDraw.type,
       name: name.trim() || (def.label + ' ' + terrainSeq),
       points: activeDraw.points.slice(),
-      navigable: true
+      navigable: true,
+      countryId: findCountryAt(terrainCentroid.x, terrainCentroid.y)
     };
     terrainFeatures.push(feature);
     drawTerrainFeature(feature);
@@ -680,13 +684,13 @@
 
   function exportTerrainJson() {
     return JSON.stringify(terrainFeatures.map(t => ({
-      type: t.type, name: t.name, points: t.points, navigable: t.navigable
+      type: t.type, name: t.name, points: t.points, navigable: t.navigable, countryId: t.countryId || null
     })), null, 2);
   }
 
   function exportElevationJson() {
     return JSON.stringify(elevationFeatures.map(e => ({
-      type: e.type, name: e.name, altitude: e.altitude, points: e.points
+      type: e.type, name: e.name, altitude: e.altitude, points: e.points, countryId: e.countryId || null
     })), null, 2);
   }
 
@@ -772,7 +776,11 @@
         type: item.type,
         name: item.name || (item.type + ' ' + terrainSeq),
         points: item.points,
-        navigable: item.navigable !== false
+        navigable: item.navigable !== false,
+        countryId: item.countryId || findCountryAt(
+          item.points.reduce((a, p) => a + p.x, 0) / item.points.length,
+          item.points.reduce((a, p) => a + p.y, 0) / item.points.length
+        )
       };
       terrainFeatures.push(feature);
       drawTerrainFeature(feature);
@@ -803,7 +811,11 @@
         type: item.type,
         name: item.name || (item.type + ' ' + elevationSeq),
         altitude: typeof item.altitude === 'number' ? item.altitude : null,
-        points: item.points
+        points: item.points,
+        countryId: item.countryId || findCountryAt(
+          item.points.reduce((a, p) => a + p.x, 0) / item.points.length,
+          item.points.reduce((a, p) => a + p.y, 0) / item.points.length
+        )
       };
       elevationFeatures.push(feature);
       drawElevationFeature(feature);

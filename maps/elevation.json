@@ -52,7 +52,8 @@
         "x": 188.3,
         "y": 568.5
       }
-    ]
+    ],
+    "countryId": "country_028"
   },
   {
     "type": "mountain",
@@ -131,7 +132,8 @@
         "x": 355.3,
         "y": 291.4
       }
-    ]
+    ],
+    "countryId": "country_015"
   },
   {
     "type": "mountain",
@@ -238,7 +240,8 @@
         "x": 511.7,
         "y": 312.7
       }
-    ]
+    ],
+    "countryId": "country_017"
   },
   {
     "type": "mountain",
@@ -317,7 +320,8 @@
         "x": 607.6,
         "y": 461.9
       }
-    ]
+    ],
+    "countryId": "country_024"
   },
   {
     "type": "mountain",
@@ -412,7 +416,8 @@
         "x": 454.8,
         "y": 199
       }
-    ]
+    ],
+    "countryId": null
   },
   {
     "type": "mountain",
@@ -475,7 +480,8 @@
         "x": 618.3,
         "y": 159.9
       }
-    ]
+    ],
+    "countryId": "country_011"
   },
   {
     "type": "mountain",
@@ -550,7 +556,8 @@
         "x": 959.4,
         "y": 238.1
       }
-    ]
+    ],
+    "countryId": "country_012"
   },
   {
     "type": "mountain",
@@ -609,7 +616,8 @@
         "x": 938.1,
         "y": 302
       }
-    ]
+    ],
+    "countryId": null
   },
   {
     "type": "mountain",
@@ -644,7 +652,8 @@
         "x": 888.3,
         "y": 771.1
       }
-    ]
+    ],
+    "countryId": null
   },
   {
     "type": "mountain",
@@ -823,7 +832,8 @@
         "x": 458.4,
         "y": 835
       }
-    ]
+    ],
+    "countryId": "country_041"
   },
   {
     "type": "desert",
@@ -886,7 +896,8 @@
         "x": 479.7,
         "y": 298.5
       }
-    ]
+    ],
+    "countryId": null
   },
   {
     "type": "desert",
@@ -925,7 +936,8 @@
         "x": 273.6,
         "y": 184.8
       }
-    ]
+    ],
+    "countryId": "country_008"
   },
   {
     "type": "desert",
@@ -968,7 +980,8 @@
         "x": 618.3,
         "y": 127.9
       }
-    ]
+    ],
+    "countryId": "country_002"
   },
   {
     "type": "desert",
@@ -1003,7 +1016,8 @@
         "x": 902.5,
         "y": 241.6
       }
-    ]
+    ],
+    "countryId": "country_013"
   },
   {
     "type": "desert",
@@ -1066,7 +1080,8 @@
         "x": 728.4,
         "y": 746.2
       }
-    ]
+    ],
+    "countryId": null
   },
   {
     "type": "desert",
@@ -1153,7 +1168,8 @@
         "x": 607.6,
         "y": 1137.1
       }
-    ]
+    ],
+    "countryId": "country_049"
   },
   {
     "type": "forest",
@@ -1736,7 +1752,8 @@
         "x": 330.5,
         "y": 838.6
       }
-    ]
+    ],
+    "countryId": "country_041"
   },
   {
     "type": "forest",
@@ -1771,7 +1788,8 @@
         "x": 941.6,
         "y": 1016.2
       }
-    ]
+    ],
+    "countryId": "country_045"
   },
   {
     "type": "forest",
@@ -1878,7 +1896,8 @@
         "x": 234.5,
         "y": 540.1
       }
-    ]
+    ],
+    "countryId": "country_028"
   },
   {
     "type": "forest",
@@ -1941,7 +1960,8 @@
         "x": 504.6,
         "y": 774.6
       }
-    ]
+    ],
+    "countryId": "country_035"
   },
   {
     "type": "forest",
@@ -2072,7 +2092,8 @@
         "x": 607.6,
         "y": 547.2
       }
-    ]
+    ],
+    "countryId": "country_024"
   },
   {
     "type": "forest",
@@ -2175,7 +2196,8 @@
         "x": 199,
         "y": 220.3
       }
-    ]
+    ],
+    "countryId": "country_008"
   },
   {
     "type": "forest",
@@ -2302,7 +2324,8 @@
         "x": 415.7,
         "y": 284.3
       }
-    ]
+    ],
+    "countryId": "country_005"
   },
   {
     "type": "forest",
@@ -2393,7 +2416,8 @@
         "x": 497.5,
         "y": 316.2
       }
-    ]
+    ],
+    "countryId": "country_051"
   },
   {
     "type": "forest",
@@ -2488,7 +2512,8 @@
         "x": 568.5,
         "y": 202.5
       }
-    ]
+    ],
+    "countryId": "country_011"
   },
   {
     "type": "forest",
@@ -2567,7 +2592,8 @@
         "x": 987.8,
         "y": 259.4
       }
-    ]
+    ],
+    "countryId": "country_012"
   },
   {
     "type": "plateau",
@@ -2750,7 +2776,8 @@
         "x": 444.2,
         "y": 319.8
       }
-    ]
+    ],
+    "countryId": "country_051"
   },
   {
     "type": "plateau",
@@ -2781,7 +2808,8 @@
         "x": 202.5,
         "y": 529.4
       }
-    ]
+    ],
+    "countryId": "country_028"
   },
   {
     "type": "plateau",
@@ -2856,7 +2884,8 @@
         "x": 739.1,
         "y": 664.5
       }
-    ]
+    ],
+    "countryId": "country_032"
   },
   {
     "type": "plateau",
@@ -2915,7 +2944,8 @@
         "x": 984.3,
         "y": 319.8
       }
-    ]
+    ],
+    "countryId": "country_012"
   },
   {
     "type": "plateau",
@@ -2978,7 +3008,8 @@
         "x": 931,
         "y": 767.5
       }
-    ]
+    ],
+    "countryId": "country_033"
   },
   {
     "type": "plateau",
@@ -3037,7 +3068,8 @@
         "x": 671.6,
         "y": 955.8
       }
-    ]
+    ],
+    "countryId": "country_043"
   },
   {
     "type": "plateau",
@@ -3100,7 +3132,8 @@
         "x": 582.7,
         "y": 216.8
       }
-    ]
+    ],
+    "countryId": "country_011"
   },
   {
     "type": "plateau",
@@ -3171,7 +3204,8 @@
         "x": 287.8,
         "y": 287.8
       }
-    ]
+    ],
+    "countryId": "country_015"
   },
   {
     "type": "plateau",
@@ -3198,7 +3232,8 @@
         "x": 888.3,
         "y": 49.7
       }
-    ]
+    ],
+    "countryId": "country_001"
   },
   {
     "type": "forest",
@@ -3245,6 +3280,7 @@
         "x": 884.8,
         "y": 49.7
       }
-    ]
+    ],
+    "countryId": "country_001"
   }
 ]

@@ -24,7 +24,8 @@
         "y": 554.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -43,7 +44,8 @@
         "y": 525.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -66,7 +68,8 @@
         "y": 525.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -93,7 +96,8 @@
         "y": 536.6
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -120,7 +124,8 @@
         "y": 572.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -143,7 +148,8 @@
         "y": 575.6
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "river",
@@ -170,7 +176,8 @@
         "y": 543.7
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_028"
   },
   {
     "type": "lake",
@@ -205,7 +212,8 @@
         "y": 351.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_051"
   },
   {
     "type": "lake",
@@ -232,11 +240,12 @@
         "y": 223.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_008"
   },
   {
     "type": "lake",
-    "name": "Lebroistër Lake",
+    "name": "Lebroist\u00ebr Lake",
     "points": [
       {
         "x": 355.3,
@@ -255,7 +264,8 @@
         "y": 259.4
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_015"
   },
   {
     "type": "lake",
@@ -274,7 +284,8 @@
         "y": 188.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_005"
   },
   {
     "type": "lake",
@@ -305,11 +316,12 @@
         "y": 238.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_011"
   },
   {
     "type": "lake",
-    "name": "Lake Bronté",
+    "name": "Lake Bront\u00e9",
     "points": [
       {
         "x": 540.1,
@@ -324,7 +336,8 @@
         "y": 405.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_021"
   },
   {
     "type": "lake",
@@ -351,7 +364,8 @@
         "y": 454.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_023"
   },
   {
     "type": "lake",
@@ -378,7 +392,8 @@
         "y": 419.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_022"
   },
   {
     "type": "lake",
@@ -401,7 +416,8 @@
         "y": 533
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_027"
   },
   {
     "type": "lake",
@@ -428,7 +444,8 @@
         "y": 710.7
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_032"
   },
   {
     "type": "lake",
@@ -455,7 +472,8 @@
         "y": 739.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_033"
   },
   {
     "type": "lake",
@@ -478,7 +496,8 @@
         "y": 1169
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_049"
   },
   {
     "type": "lake",
@@ -541,7 +560,8 @@
         "y": 923.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_041"
   },
   {
     "type": "lake",
@@ -568,7 +588,8 @@
         "y": 991.4
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_042"
   },
   {
     "type": "river",
@@ -623,7 +644,8 @@
         "y": 913.2
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_041"
   },
   {
     "type": "river",
@@ -642,7 +664,8 @@
         "y": 881.2
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_041"
   },
   {
     "type": "river",
@@ -681,7 +704,8 @@
         "y": 984.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_041"
   },
   {
     "type": "river",
@@ -916,7 +940,8 @@
         "y": 874.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_041"
   },
   {
     "type": "river",
@@ -983,7 +1008,8 @@
         "y": 724.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_035"
   },
   {
     "type": "river",
@@ -1134,7 +1160,8 @@
         "y": 803.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": null
   },
   {
     "type": "river",
@@ -1177,7 +1204,8 @@
         "y": 717.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": null
   },
   {
     "type": "river",
@@ -1228,7 +1256,8 @@
         "y": 543.7
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_026"
   },
   {
     "type": "river",
@@ -1255,7 +1284,8 @@
         "y": 572.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_026"
   },
   {
     "type": "river",
@@ -1282,11 +1312,12 @@
         "y": 568.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_029"
   },
   {
     "type": "river",
-    "name": "River Courtesá",
+    "name": "River Courtes\u00e1",
     "points": [
       {
         "x": 632.5,
@@ -1333,7 +1364,8 @@
         "y": 415.7
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_022"
   },
   {
     "type": "river",
@@ -1368,7 +1400,8 @@
         "y": 1002
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_042"
   },
   {
     "type": "river",
@@ -1463,7 +1496,8 @@
         "y": 938.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_042"
   },
   {
     "type": "river",
@@ -1538,7 +1572,8 @@
         "y": 1051.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_046"
   },
   {
     "type": "river",
@@ -1561,7 +1596,8 @@
         "y": 1144.2
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_049"
   },
   {
     "type": "river",
@@ -1584,7 +1620,8 @@
         "y": 728.4
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_033"
   },
   {
     "type": "river",
@@ -1627,7 +1664,8 @@
         "y": 817.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_033"
   },
   {
     "type": "river",
@@ -1698,7 +1736,8 @@
         "y": 401.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_020"
   },
   {
     "type": "river",
@@ -1765,7 +1804,8 @@
         "y": 330.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_009"
   },
   {
     "type": "river",
@@ -1788,7 +1828,8 @@
         "y": 234.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_009"
   },
   {
     "type": "river",
@@ -1863,7 +1904,8 @@
         "y": 234.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_011"
   },
   {
     "type": "river",
@@ -1950,7 +1992,8 @@
         "y": 170.6
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_004"
   },
   {
     "type": "river",
@@ -1977,7 +2020,8 @@
         "y": 209.6
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_004"
   },
   {
     "type": "river",
@@ -1996,7 +2040,8 @@
         "y": 223.9
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_011"
   },
   {
     "type": "river",
@@ -2035,7 +2080,8 @@
         "y": 316.2
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_015"
   },
   {
     "type": "river",
@@ -2062,7 +2108,8 @@
         "y": 270.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_015"
   },
   {
     "type": "river",
@@ -2165,7 +2212,8 @@
         "y": 135
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_005"
   },
   {
     "type": "river",
@@ -2200,7 +2248,8 @@
         "y": 227.4
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_008"
   },
   {
     "type": "river",
@@ -2227,7 +2276,8 @@
         "y": 206.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_005"
   },
   {
     "type": "river",
@@ -2266,7 +2316,8 @@
         "y": 312.7
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_051"
   },
   {
     "type": "river",
@@ -2321,7 +2372,8 @@
         "y": 465.5
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_021"
   },
   {
     "type": "river",
@@ -2348,7 +2400,8 @@
         "y": 355.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_021"
   },
   {
     "type": "river",
@@ -2375,7 +2428,8 @@
         "y": 220.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_012"
   },
   {
     "type": "river",
@@ -2422,7 +2476,8 @@
         "y": 287.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_012"
   },
   {
     "type": "river",
@@ -2449,7 +2504,8 @@
         "y": 287.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_012"
   },
   {
     "type": "lake",
@@ -2468,7 +2524,8 @@
         "y": 71.1
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_001"
   },
   {
     "type": "river",
@@ -2487,7 +2544,8 @@
         "y": 85.3
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_001"
   },
   {
     "type": "lake",
@@ -2506,7 +2564,8 @@
         "y": 1019.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_045"
   },
   {
     "type": "river",
@@ -2529,6 +2588,7 @@
         "y": 987.8
       }
     ],
-    "navigable": true
+    "navigable": true,
+    "countryId": "country_045"
   }
 ]
